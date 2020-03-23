@@ -25,12 +25,12 @@ public class CameraActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
-        PictureCaptureService.startActionTakingPictures(getApplicationContext());
-//        if (null == savedInstanceState) {
-//            getSupportFragmentManager().beginTransaction()
-//                    .replace(R.id.container, Camera2BasicFragment.newInstance())
-//                    .commit();
-//        }
+//        PictureCaptureService.startActionTakingPictures(getApplicationContext());
+        if (null == savedInstanceState) {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.camera_container, Camera2BasicFragment.newInstance())
+                    .commit();
+        }
     }
 
 }
