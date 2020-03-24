@@ -16,27 +16,29 @@
 
 package com.example.android.camera2basic;
 
-import android.app.Activity;
-import android.app.Dialog;
 import android.content.DialogInterface;
-import android.graphics.RadialGradient;
-import android.graphics.drawable.Drawable;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.ImageView;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.PreferenceManager;
 
 public class CameraActivity extends AppCompatActivity {
 
+    public final String TAG = "CameraActivity";
+
+    public final String IMAGE_FREQUENCY_KEY = "IMAGE_FREQUENCY";
+    public final int IMAGE_FREQUENCY_DEFAULT_MILI = 3000;
+
     public final int DELAY_BEFORE_TAKING_PICTURES_MILLIS = 5000;
-    public final int IMAGE_FREQUENCY_MILI = 3000;
+    public int imageFrequencyMili;
 
     Handler handler;
 
@@ -45,7 +47,10 @@ public class CameraActivity extends AppCompatActivity {
     private Camera2BasicFragment camera2BasicFragment;
 
     Button stopTakingPicturesButton;
+    private SharedPreferences preference;
 
+    //todo: remove after debug
+    private long lastRunTime = 0;
 
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -53,10 +58,15 @@ public class CameraActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
+
+
+        // load image frequency from shared preference
+        preference = PreferenceManager.getDefaultSharedPreferences(this);
+        imageFrequencyMili = preference.getInt(IMAGE_FREQUENCY_KEY, IMAGE_FREQUENCY_DEFAULT_MILI);
+
         camera2BasicFragment = Camera2BasicFragment.newInstance();
         stopTakingPicturesButton = findViewById(R.id.stop_taking_pictures_button);
 
-        ;
 
         if (null == savedInstanceState) {
             getSupportFragmentManager().beginTransaction()
@@ -69,7 +79,13 @@ public class CameraActivity extends AppCompatActivity {
             @Override
             public void run() {
                 camera2BasicFragment.takePicture();
-                handler.postDelayed(takingPicturesRunnable, IMAGE_FREQUENCY_MILI);
+
+                //todo: remove after debug
+                Log.d(TAG, "imageFrequency:" + imageFrequencyMili);
+                Log.d(TAG, String.format("dt: %d", System.currentTimeMillis() - lastRunTime));
+                lastRunTime = System.currentTimeMillis();
+
+                handler.postDelayed(takingPicturesRunnable, imageFrequencyMili);
             }
         };
 
@@ -83,8 +99,16 @@ public class CameraActivity extends AppCompatActivity {
         startTakingPictures();
     }
 
+    public void updateImageFrequency(int frequency) {
+        imageFrequencyMili = frequency;
+        preference.edit().putInt(IMAGE_FREQUENCY_KEY, imageFrequencyMili).apply();
+    }
+
     public void startTakingPictures() {
-        handler.postDelayed(takingPicturesRunnable, DELAY_BEFORE_TAKING_PICTURES_MILLIS);
+        if (!handler.hasCallbacks(takingPicturesRunnable)) {
+            Log.i(TAG, "startTakingPictures");
+            handler.postDelayed(takingPicturesRunnable, DELAY_BEFORE_TAKING_PICTURES_MILLIS);
+        }
     }
 
     public void stopTakingPictures() {
@@ -105,13 +129,13 @@ public class CameraActivity extends AppCompatActivity {
 
     public void stopTakingPicturesDialog() {
         new AlertDialog.Builder(this, R.style.AlertDialogTheme)
-                .setMessage("להפסיק צילום?")
-                .setPositiveButton("המשך צילום", new DialogInterface.OnClickListener() {
+                .setMessage(R.string.stop_taking_pictures_dialog)
+                .setPositiveButton(R.string.stop_taking_picture_dialog_keep_taking_pictures, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                     }
                 })
-                .setNegativeButton("הפסק צילום", new DialogInterface.OnClickListener() {
+                .setNegativeButton(R.string.stop_taking_pictures_dialog_stop_taking_pictures, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         stopTakingPictures();
