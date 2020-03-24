@@ -16,11 +16,20 @@
 
 package com.example.android.camera2basic;
 
+import android.app.Activity;
+import android.app.Dialog;
+import android.content.DialogInterface;
+import android.graphics.RadialGradient;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -37,12 +46,17 @@ public class CameraActivity extends AppCompatActivity {
 
     Button stopTakingPicturesButton;
 
+
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
         camera2BasicFragment = Camera2BasicFragment.newInstance();
-         stopTakingPicturesButton = findViewById(R.id.stop_taking_pictures_button);
+        stopTakingPicturesButton = findViewById(R.id.stop_taking_pictures_button);
+
+        ;
 
         if (null == savedInstanceState) {
             getSupportFragmentManager().beginTransaction()
@@ -62,7 +76,7 @@ public class CameraActivity extends AppCompatActivity {
         stopTakingPicturesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                stopTakingPictures();
+                stopTakingPicturesDialog();
             }
         });
 
@@ -89,6 +103,21 @@ public class CameraActivity extends AppCompatActivity {
         startTakingPictures();
     }
 
-    //    AlertDialog alertDialog =
+    public void stopTakingPicturesDialog() {
+        new AlertDialog.Builder(this, R.style.AlertDialogTheme)
+                .setMessage("להפסיק צילום?")
+                .setPositiveButton("המשך צילום", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                })
+                .setNegativeButton("הפסק צילום", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        stopTakingPictures();
+                        finish();
+                    }
+                }).show();
+    }
 
 }

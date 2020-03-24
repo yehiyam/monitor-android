@@ -24,41 +24,44 @@
         android:id="@+id/camera_container"
         android:name="com.example.android.camera2basic.Camera2BasicFragment"
         android:layout_width="0dp"
-        android:layout_height="435dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_height="500dp"
+        app:layout_constraintBottom_toTopOf="@+id/stop_taking_pictures_button"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.505"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView4"
-        app:layout_constraintVertical_bias="0.35" />
+        app:layout_constraintTop_toBottomOf="@+id/patient_number" />
 
     <TextView
-        android:id="@+id/textView3"
+        android:id="@+id/patient_number"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="TextView"
-        app:layout_constraintBottom_toTopOf="@+id/textView4"
+        android:layout_marginTop="8dp"
+        android:text="@string/default_patient_number"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.47"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.642"
-        app:layout_constraintVertical_chainStyle="spread" />
+        app:layout_constraintTop_toBottomOf="@+id/monitor_number" />
 
     <TextView
-        android:id="@+id/textView4"
+        android:id="@+id/monitor_number"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="TextView"
-        tools:layout_editor_absoluteX="184dp"
-        tools:layout_editor_absoluteY="142dp" />
+        android:layout_height="@dimen/camera_activity_text_view_high"
+        android:layout_marginTop="44dp"
+
+        android:text="@string/default_patient_number"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/stop_taking_pictures_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="הפסק לצלם"
+        android:text="@string/stop_taking_pictures_button_text"
+        android:textColor="@color/buttons_text_colors"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/camera_container"
-        tools:layout_editor_absoluteX="177dp" />
+        android:background="@drawable/rounded_rectangle"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

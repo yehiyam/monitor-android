@@ -29,5 +29,8 @@
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
     <string name="start_taking_pictures_button">start_taking_pictures_button</string>
+    <string name="default_patient_number">##########</string>
+    <string name="stop_taking_pictures_button_text">הפסק צילום</string>
+    <string name="start_video_text">לחץ על הכפתור האדום להתחלת צילום</string>
 
 </resources>
