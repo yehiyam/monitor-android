@@ -247,8 +247,8 @@ public class Camera2BasicFragment extends Fragment
         public void onImageAvailable(ImageReader reader) {
 
             //todo: remove this after testing
-//            mBackgroundHandler.post(new Publisher(reader.acquireNextImage(), id, getActivity()));
-            mBackgroundHandler.post(new ImageSaver(reader.acquireNextImage(), mFile));
+            mBackgroundHandler.post(new Publisher(reader.acquireNextImage(), id, getActivity()));
+//            mBackgroundHandler.post(new ImageSaver(reader.acquireNextImage(), mFile));
         }
 
     };

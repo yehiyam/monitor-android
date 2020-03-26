@@ -35,9 +35,10 @@ public class CameraActivity extends AppCompatActivity {
     public final String TAG = "CameraActivity";
 
     public final String IMAGE_FREQUENCY_KEY = "IMAGE_FREQUENCY";
-    public final int IMAGE_FREQUENCY_DEFAULT_MILI = 3000;
+    public final int IMAGE_FREQUENCY_DEFAULT_MILI = 5000;
 
-    public final int DELAY_BEFORE_TAKING_PICTURES_MILLIS = 5000;
+    public final int DELAY_BEFORE_TAKING_PICTURES_MILLIS = 2000;
+
     public int imageFrequencyMili;
 
     Handler handler;
