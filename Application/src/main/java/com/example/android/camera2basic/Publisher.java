@@ -41,7 +41,7 @@ class Publisher implements Runnable {
      * @return
      */
 
-    public void sendImageInPost(byte[] image, String imageId, String timeStamp) {
+    public void sendImageInPost(byte[] image, final String imageId, String timeStamp) {
         String requestUrl = String.format("%s/%s", SERVER_URL, UPLOAD_IMAGE_REST_FUNCTION);
 
         OkHttpClient client = new OkHttpClient().newBuilder()
@@ -63,11 +63,11 @@ class Publisher implements Runnable {
         mActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(mActivity, "sending image", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mActivity, "sending image " + imageId, Toast.LENGTH_SHORT).show();
             }
         });
 
-        Request request = requestBuilder.build();
+        final Request request = requestBuilder.build();
         Log.d(TAG, "sendImageInPost: " + request);
 
 
@@ -80,7 +80,8 @@ class Publisher implements Runnable {
                 mActivity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(mActivity, "did not get response", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mActivity, String.format("%s: did not get response", imageId) , Toast.LENGTH_SHORT).show();
+                        Log.d(TAG, String.format("%s: did not get response", imageId));
                     }
                 });
             }
@@ -91,7 +92,7 @@ class Publisher implements Runnable {
                     @Override
                     public void run() {
                         Log.d(TAG, "run: " + response);
-                        Toast.makeText(mActivity, "got response from server", Toast.LENGTH_LONG).show();
+                        Toast.makeText(mActivity, String.format("%s: got return code: " + response.code(), imageId), Toast.LENGTH_LONG).show();
                     }
                 });
             }

@@ -22,6 +22,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.util.Size;
 import android.view.View;
 import android.widget.Button;
 
@@ -56,6 +57,8 @@ public class CameraActivity extends AppCompatActivity {
     //todo: remove after debug
     private long lastRunTime = 0;
 
+    private Size imageResolution;
+
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -67,11 +70,12 @@ public class CameraActivity extends AppCompatActivity {
         preference = PreferenceManager.getDefaultSharedPreferences(this);
         imageFrequencyMili = preference.getInt(IMAGE_FREQUENCY_KEY, IMAGE_FREQUENCY_DEFAULT_MILI);
 
+        imageResolution = new Size(1920, 1080);
+
         imageId = preference.getInt(IMAGE_ID_KEY, 1);
 
         camera2BasicFragment = Camera2BasicFragment.newInstance();
         stopTakingPicturesButton = findViewById(R.id.stop_taking_pictures_button);
-
 
         if (null == savedInstanceState) {
             getSupportFragmentManager().beginTransaction()
@@ -156,5 +160,13 @@ public class CameraActivity extends AppCompatActivity {
 
     public int getImageId() {
         return imageId;
+    }
+
+    public Size getImageResolution() {
+        return imageResolution;
+    }
+
+    public void setImageResolution(Size imageResolution) {
+        this.imageResolution = imageResolution;
     }
 }

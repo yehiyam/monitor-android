@@ -234,8 +234,6 @@ public class Camera2BasicFragment extends Fragment
      */
     private File mFile;
 
-    private final String id = "111";
-
     /**
      * This a callback object for the {@link ImageReader}. "onImageAvailable" will be called when a
      * still image is ready to be saved.
@@ -247,8 +245,8 @@ public class Camera2BasicFragment extends Fragment
         public void onImageAvailable(ImageReader reader) {
 
             //todo: remove this after testing
-            mBackgroundHandler.post(new Publisher(reader.acquireNextImage(), getActivity()));
-//            mBackgroundHandler.post(new ImageSaver(reader.acquireNextImage(), mFile));
+//            mBackgroundHandler.post(new Publisher(reader.acquireNextImage(), getActivity()));
+            mBackgroundHandler.post(new ImageSaver(reader.acquireNextImage(), mFile));
         }
 
     };
@@ -511,10 +509,19 @@ public class Camera2BasicFragment extends Fragment
                     continue;
                 }
 
+
+                Size largest = ((CameraActivity) getActivity()).getImageResolution();
+
                 // For still image captures, we use the largest available size.
-                Size largest = Collections.max(
-                        Arrays.asList(map.getOutputSizes(ImageFormat.JPEG)),
-                        new CompareSizesByArea());
+                if (largest == null) {
+                    largest = Collections.max(
+                            Arrays.asList(map.getOutputSizes(ImageFormat.JPEG)),
+                            new CompareSizesByArea());
+                }
+
+                Log.d(TAG, "setUpCameraOutputs: " + largest);
+
+
                 mImageReader = ImageReader.newInstance(largest.getWidth(), largest.getHeight(),
                         ImageFormat.JPEG, /*maxImages*/2);
                 mImageReader.setOnImageAvailableListener(
@@ -838,7 +845,7 @@ public class Camera2BasicFragment extends Fragment
                 public void onCaptureCompleted(@NonNull CameraCaptureSession session,
                                                @NonNull CaptureRequest request,
                                                @NonNull TotalCaptureResult result) {
-//                    showToast("Saved: " + mFile);
+                    showToast("Saved: " + mFile);
                     Log.d(TAG, mFile.toString());
                     unlockFocus();
                 }
