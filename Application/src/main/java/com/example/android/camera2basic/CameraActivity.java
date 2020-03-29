@@ -70,7 +70,7 @@ public class CameraActivity extends AppCompatActivity {
         preference = PreferenceManager.getDefaultSharedPreferences(this);
         imageFrequencyMili = preference.getInt(IMAGE_FREQUENCY_KEY, IMAGE_FREQUENCY_DEFAULT_MILI);
 
-        imageResolution = new Size(1920, 1080);
+        imageResolution = new Size(800, 600);
 
         imageId = preference.getInt(IMAGE_ID_KEY, 1);
 

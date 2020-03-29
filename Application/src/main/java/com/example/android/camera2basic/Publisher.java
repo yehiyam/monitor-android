@@ -7,6 +7,8 @@ import android.widget.Toast;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
@@ -100,6 +102,25 @@ class Publisher implements Runnable {
 
     }
 
+    public void saveImage(byte[] bytes) {
+        FileOutputStream output = null;
+        try {
+            output = new FileOutputStream(new File(mActivity.getExternalFilesDir(null), ((CameraActivity)mActivity).getImageId() + ".jpg"));
+            output.write(bytes);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            mImage.close();
+            if (null != output) {
+                try {
+                    output.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
     Publisher(Image image, Activity activity) {
         mImage = image;
 
@@ -113,6 +134,7 @@ class Publisher implements Runnable {
         byte[] bytes = new byte[buffer.remaining()];
         buffer.get(bytes);
         sendImageInPost(bytes, String.valueOf( ((CameraActivity) mActivity).getImageId()), String.valueOf(System.currentTimeMillis()));
+        saveImage(bytes);
         ((CameraActivity) mActivity).addToImageIdCounter();
         mImage.close();
         }
