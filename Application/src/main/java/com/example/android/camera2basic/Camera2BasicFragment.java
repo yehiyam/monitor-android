@@ -45,6 +45,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
@@ -68,6 +69,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
@@ -251,6 +253,7 @@ public class Camera2BasicFragment extends Fragment
 
     };
 
+
     /**
      * {@link CaptureRequest.Builder} for the camera preview
      */
@@ -422,6 +425,12 @@ public class Camera2BasicFragment extends Fragment
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        ((CameraActivity) getActivity()).setSupportedResolutions(getSupportedResolutions());
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_camera2_basic, container, false);
@@ -511,6 +520,7 @@ public class Camera2BasicFragment extends Fragment
 
 
                 Size largest = ((CameraActivity) getActivity()).getImageResolution();
+//                ((CameraActivity) getActivity()).setSupportedResolutions(map.getOutputSizes(ImageFormat.JPEG));
 
                 // For still image captures, we use the largest available size.
                 if (largest == null) {
@@ -519,7 +529,7 @@ public class Camera2BasicFragment extends Fragment
                             new CompareSizesByArea());
                 }
 
-                Log.d(TAG, "setUpCameraOutputs: " + largest);
+                Log.d(TAG, "resolution: " + largest);
 
 
                 mImageReader = ImageReader.newInstance(largest.getWidth(), largest.getHeight(),
@@ -606,6 +616,19 @@ public class Camera2BasicFragment extends Fragment
         }
     }
 
+    public Size[] getSupportedResolutions() {
+        CameraManager manager = (CameraManager) getActivity().getSystemService(Context.CAMERA_SERVICE);
+        try {
+            CameraCharacteristics characteristics
+                    = Objects.requireNonNull(manager).getCameraCharacteristics(manager.getCameraIdList()[0]);
+            StreamConfigurationMap map = characteristics.get(
+                    CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
+            return Objects.requireNonNull(map).getOutputSizes(ImageFormat.JPEG);
+        } catch (CameraAccessException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
     /**
      * Opens the camera specified by {@link Camera2BasicFragment#mCameraId}.
      */

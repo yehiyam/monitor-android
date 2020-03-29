@@ -18,6 +18,9 @@ package com.example.android.camera2basic;
 
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.graphics.ImageFormat;
+import android.hardware.camera2.CameraCharacteristics;
+import android.hardware.camera2.params.StreamConfigurationMap;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -25,13 +28,26 @@ import android.util.Log;
 import android.util.Size;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.preference.PreferenceManager;
 
+import java.util.Arrays;
+
 public class CameraActivity extends AppCompatActivity {
+
+    Button resolutionPlus;
+    Button resolutionMinus;
+
+    TextView currentResolution;
 
     public final String TAG = "CameraActivity";
 
@@ -59,6 +75,12 @@ public class CameraActivity extends AppCompatActivity {
 
     private Size imageResolution;
 
+    private Size[] supportedResolution = null;
+//    int resolutionIndex = 0;
+//    MutableLiveData<Integer> resolutionIndex;
+
+    ResolutionViewModel resolutionViewModel;
+
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -77,11 +99,15 @@ public class CameraActivity extends AppCompatActivity {
         camera2BasicFragment = Camera2BasicFragment.newInstance();
         stopTakingPicturesButton = findViewById(R.id.stop_taking_pictures_button);
 
+
+
         if (null == savedInstanceState) {
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.camera_container, camera2BasicFragment)
                     .commit();
         }
+
+//        supportedResolution = camera2BasicFragment.getSupportedResolutions();
 
         handler = new Handler();
         takingPicturesRunnable = new Runnable() {
@@ -105,8 +131,55 @@ public class CameraActivity extends AppCompatActivity {
             }
         });
 
+
+        resolutionPlus = findViewById(R.id.plus);
+        resolutionMinus = findViewById(R.id.minus);
+        currentResolution = findViewById(R.id.current_resolution_tv);
+
+        final Observer<Integer> resolutionObserver  = new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer integer) {
+
+                imageResolution = supportedResolution[resolutionViewModel.getResolutionIndex().getValue()];
+                currentResolution.setText(imageResolution.toString());
+            }
+        };
+
+
+        resolutionViewModel = ViewModelProviders.of(this).get(ResolutionViewModel.class);
+
+        resolutionViewModel.getResolutionIndex().observe(this, resolutionObserver);
+
+        resolutionPlus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                decreaseResolutionValue();
+            }
+        });
+
+        resolutionMinus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                increaseResolutionValue();
+            }
+        });
+
         startTakingPictures();
     }
+
+    public void increaseResolutionValue() {
+        if (supportedResolution == null) {
+            return;
+        }
+
+        resolutionViewModel.getResolutionIndex().setValue(Math.min(resolutionViewModel.getResolutionIndex().getValue() + 1, supportedResolution.length - 1));
+
+    }
+
+    public void decreaseResolutionValue() {
+        resolutionViewModel.getResolutionIndex().setValue(Math.max(resolutionViewModel.getResolutionIndex().getValue() - 1, 0));
+    }
+
 
     public void addToImageIdCounter() {
         imageId += 1;
@@ -168,5 +241,15 @@ public class CameraActivity extends AppCompatActivity {
 
     public void setImageResolution(Size imageResolution) {
         this.imageResolution = imageResolution;
+    }
+
+    public Size[] getSupportedResolution() {
+        return supportedResolution;
+    }
+
+    public void setSupportedResolutions(Size[] supportedResolution) {
+        if (supportedResolution != null) {
+            this.supportedResolution = supportedResolution;
+        }
     }
 }

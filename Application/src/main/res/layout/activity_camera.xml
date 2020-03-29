@@ -29,27 +29,15 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/patient_number" />
+        app:layout_constraintTop_toBottomOf="@+id/current_resolution_tv" />
 
     <TextView
-        android:id="@+id/patient_number"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="@string/default_patient_number"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/monitor_number" />
-
-    <TextView
-        android:id="@+id/monitor_number"
-        android:layout_width="wrap_content"
-        android:layout_height="@dimen/camera_activity_text_view_high"
+        android:id="@+id/current_resolution_tv"
+        android:layout_width="162dp"
+        android:layout_height="28dp"
         android:layout_marginTop="44dp"
-
-        android:text="@string/default_patient_number"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/plus"
+        app:layout_constraintStart_toEndOf="@+id/minus"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
@@ -63,5 +51,30 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/camera_container"
         android:background="@drawable/rounded_rectangle"/>
+
+    <Button
+        android:id="@+id/minus"
+        android:layout_width="57dp"
+        android:layout_height="45dp"
+        android:layout_marginStart="40dp"
+        android:layout_marginEnd="20dp"
+        android:text="-"
+        app:layout_constraintBottom_toTopOf="@+id/camera_container"
+        app:layout_constraintEnd_toStartOf="@+id/current_resolution_tv"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.491" />
+
+    <Button
+        android:id="@+id/plus"
+        android:layout_width="60dp"
+        android:layout_height="45dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="40dp"
+        android:text="+"
+        app:layout_constraintBottom_toTopOf="@+id/camera_container"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/current_resolution_tv"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
