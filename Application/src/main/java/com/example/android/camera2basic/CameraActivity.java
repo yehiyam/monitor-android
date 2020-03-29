@@ -41,6 +41,9 @@ public class CameraActivity extends AppCompatActivity {
 
     public int imageFrequencyMili;
 
+    String IMAGE_ID_KEY = "image_ID";
+    int imageId;
+
     Handler handler;
 
     Runnable takingPicturesRunnable;
@@ -60,10 +63,11 @@ public class CameraActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
 
-
         // load image frequency from shared preference
         preference = PreferenceManager.getDefaultSharedPreferences(this);
         imageFrequencyMili = preference.getInt(IMAGE_FREQUENCY_KEY, IMAGE_FREQUENCY_DEFAULT_MILI);
+
+        imageId = preference.getInt(IMAGE_ID_KEY, 1);
 
         camera2BasicFragment = Camera2BasicFragment.newInstance();
         stopTakingPicturesButton = findViewById(R.id.stop_taking_pictures_button);
@@ -98,6 +102,11 @@ public class CameraActivity extends AppCompatActivity {
         });
 
         startTakingPictures();
+    }
+
+    public void addToImageIdCounter() {
+        imageId += 1;
+        preference.edit().putInt(IMAGE_ID_KEY, imageId).apply();
     }
 
     public void updateImageFrequency(int frequency) {
@@ -145,4 +154,7 @@ public class CameraActivity extends AppCompatActivity {
                 }).show();
     }
 
+    public int getImageId() {
+        return imageId;
+    }
 }

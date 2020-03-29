@@ -5,9 +5,13 @@ import android.media.Image;
 import android.util.Log;
 import android.widget.Toast;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+import okhttp3.Call;
+import okhttp3.Callback;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -18,7 +22,6 @@ import okhttp3.Response;
 class Publisher implements Runnable {
 
     public static final String IMAGE_ID_KEY = "X-IMAGE-ID";
-    public static final String MONITOR_ID_KEY = "X-MONITOR-ID";
     public static final String TIME_STAMP_KEY = "X-TIMESTAMP";
 
 
@@ -27,90 +30,89 @@ class Publisher implements Runnable {
      */
 
     private final Image mImage;
-    private final String mId;
 
     private final String SERVER_URL = "http://52.157.71.156";
 
     private final String UPLOAD_IMAGE_REST_FUNCTION = "monitor_image";
     private final String TAG = "Publisher";
     private final Activity mActivity;
-    public String nextImageId;
-
     /**
      * The file we save the image into.
      * @return
      */
 
-    public Response sendImageInPost(byte[] image, String imageId, String monitorId, String timeStamp) {
-        try {
-            String requestUrl = String.format("%s/%s", SERVER_URL, UPLOAD_IMAGE_REST_FUNCTION);
-            Log.d(TAG, String.format("send request to: %s", requestUrl));
+    public void sendImageInPost(byte[] image, String imageId, String timeStamp) {
+        String requestUrl = String.format("%s/%s", SERVER_URL, UPLOAD_IMAGE_REST_FUNCTION);
 
-            OkHttpClient client = new OkHttpClient().newBuilder()
-                    .build();
-            MediaType mediaType = MediaType.parse("image/jpeg");
-                RequestBody body = RequestBody.create(image, mediaType);
+        OkHttpClient client = new OkHttpClient().newBuilder()
+                .build();
+        MediaType mediaType = MediaType.parse("image/jpeg");
+        RequestBody body = RequestBody.create(image, mediaType);
 
-            Request.Builder requestBuilder = new Request.Builder()
-                    .url(requestUrl)
-                    .method("POST", body);
-
-            if (imageId != null) {
-                requestBuilder.addHeader(IMAGE_ID_KEY, imageId);
-            }
-
-            if (monitorId != null) {
-                requestBuilder.addHeader(MONITOR_ID_KEY, monitorId);
-            }
-
-            if (timeStamp != null) {
-                requestBuilder.addHeader(TIME_STAMP_KEY, timeStamp);
-            }
-
-            Request request = requestBuilder.build();
-
-            //todo add check that the response is correct
-            return client.newCall(request).execute();
-
-        } catch (IOException e) {
-            Toast.makeText(mActivity, "error sending the image", Toast.LENGTH_LONG).show();
-            e.printStackTrace();
-            return null;
+        Request.Builder requestBuilder = new Request.Builder()
+                .url(requestUrl)
+                .method("POST", body);
+        if (imageId != null) {
+            requestBuilder.addHeader(IMAGE_ID_KEY, imageId);
         }
+
+        if (timeStamp != null) {
+            requestBuilder.addHeader(TIME_STAMP_KEY, timeStamp);
+        }
+
+        mActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(mActivity, "sending image", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        Request request = requestBuilder.build();
+        Log.d(TAG, "sendImageInPost: " + request);
+
+
+
+        //todo add check that the response is correct
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                e.printStackTrace();
+                mActivity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(mActivity, "did not get response", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull final Response response) throws IOException {
+                mActivity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Log.d(TAG, "run: " + response);
+                        Toast.makeText(mActivity, "got response from server", Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
+        });
+
     }
 
-    Publisher(Image image, String id, Activity activity) {
+    Publisher(Image image, Activity activity) {
         mImage = image;
-        mId = id;
 
         //todo: yakir look on this
         mActivity = activity;
     }
-
-//    void handleResult(Response response) {
-//        response
-//    }
 
     @Override
     public void run() {
         ByteBuffer buffer = mImage.getPlanes()[0].getBuffer();
         byte[] bytes = new byte[buffer.remaining()];
         buffer.get(bytes);
-
-        Response response = sendImageInPost(bytes, null, null, String.valueOf(System.currentTimeMillis()));
-        Log.d(TAG, "respone: " + response.toString());
-
+        sendImageInPost(bytes, String.valueOf( ((CameraActivity) mActivity).getImageId()), String.valueOf(System.currentTimeMillis()));
+        ((CameraActivity) mActivity).addToImageIdCounter();
         mImage.close();
-
-//        if (response != null) {
-//            try {
-//                response.body().string();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//            nextImageId = respone.body()
-//        }
-
-
         }
     }
