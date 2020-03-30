@@ -28,11 +28,18 @@ public class MainActivity extends AppCompatActivity {
     public static final String IMAGE_RESOLUTION_INDEX = "IMAGE_RESOLUTION_INDEX";
     public static final String IMAGE_RESOLUTION_STRING = "IMAGE_RESOLUTION_STRING";
     public static final String SERVER_URL_STRING = "SERVER_URL_STRING";
+    public static final String IMAGE_FREQUENCY_KEY = "IMAGE_FREQUENCY";
+    public static final int IMAGE_FREQUENCY_DEFAULT_MILI = 2000;
+
+
+
+
     Button resolutionPlus;
     Button resolutionMinus;
 
     TextView currentResolution;
     EditText serverUrlEt;
+    EditText imageFrequencyEt;
 
     ResolutionViewModel resolutionViewModel;
 
@@ -66,6 +73,11 @@ public class MainActivity extends AppCompatActivity {
 
         serverUrlEt = findViewById(R.id.server_url_et);
         serverUrlEt.setText(R.string.default_server_url);
+
+        imageFrequencyEt = findViewById(R.id.image_frequncy_et);
+
+        Integer imageFrequency = preference.getInt(IMAGE_FREQUENCY_KEY, IMAGE_FREQUENCY_DEFAULT_MILI);
+        imageFrequencyEt.setText(imageFrequency.toString());
 
 
         final Observer<Integer> resolutionObserver  = new Observer<Integer>() {
@@ -119,6 +131,11 @@ public class MainActivity extends AppCompatActivity {
         cameraActivityIntent.putExtra(IMAGE_RESOLUTION_INDEX, resolutionViewModel.getResolutionIndex().getValue());
         cameraActivityIntent.putExtra(IMAGE_RESOLUTION_STRING, supportedResolution[resolutionViewModel.getResolutionIndex().getValue()].toString());
         cameraActivityIntent.putExtra(SERVER_URL_STRING, serverUrlEt.getText().toString());
+
+        int imageFrequency = Integer.parseInt(imageFrequencyEt.getText().toString());
+        preference.edit().putInt(IMAGE_FREQUENCY_KEY, imageFrequency).apply();
+        cameraActivityIntent.putExtra(IMAGE_FREQUENCY_KEY, imageFrequency);
+
         startActivity(cameraActivityIntent);
     }
 
