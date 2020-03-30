@@ -17,6 +17,7 @@
 
 <resources>
     <string name="app_name">Camera2Basic</string>
+    <string name="default_server_url">http://52.157.71.156</string>
     <string name="intro_message">
         <![CDATA[
         

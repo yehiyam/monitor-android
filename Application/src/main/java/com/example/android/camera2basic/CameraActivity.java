@@ -18,38 +18,27 @@ package com.example.android.camera2basic;
 
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.graphics.ImageFormat;
-import android.hardware.camera2.CameraCharacteristics;
-import android.hardware.camera2.params.StreamConfigurationMap;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
-import android.util.Size;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
 import androidx.preference.PreferenceManager;
-
-import java.util.Arrays;
 
 public class CameraActivity extends AppCompatActivity {
 
     public final String TAG = "CameraActivity";
 
     public final String IMAGE_FREQUENCY_KEY = "IMAGE_FREQUENCY";
-    public final int IMAGE_FREQUENCY_DEFAULT_MILI = 5000;
+    public final int IMAGE_FREQUENCY_DEFAULT_MILI = 2000;
 
-    public final int DELAY_BEFORE_TAKING_PICTURES_MILLIS = 2000;
+    public final int DELAY_BEFORE_TAKING_PICTURES_MILLIS = 4000;
 
     public int imageFrequencyMili;
 
@@ -70,6 +59,8 @@ public class CameraActivity extends AppCompatActivity {
 
     int resolutionIndex;
 
+    public String serverUrl;
+
 //    int resolutionIndex = 0;
 //    MutableLiveData<Integer> resolutionIndex;
 
@@ -88,6 +79,10 @@ public class CameraActivity extends AppCompatActivity {
 
         resolutionIndex = getIntent().getIntExtra(MainActivity.IMAGE_RESOLUTION_INDEX,  0);
         String resolutionString = getIntent().getStringExtra(MainActivity.IMAGE_RESOLUTION_STRING);
+
+        serverUrl = getIntent().getStringExtra(MainActivity.SERVER_URL_STRING);
+
+        updateImageFrequency(IMAGE_FREQUENCY_DEFAULT_MILI);
 
         TextView resolutionStringTv = findViewById(R.id.resolution_string_tv);
         resolutionStringTv.setText(resolutionString);

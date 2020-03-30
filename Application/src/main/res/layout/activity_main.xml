@@ -10,23 +10,23 @@
         android:id="@+id/start_taking_pictures_button"
         android:layout_width="@dimen/main_activity_video_icon"
         android:layout_height="@dimen/main_activity_video_icon"
+        android:layout_marginTop="50dp"
+        android:background="@drawable/ic_videocam_black_24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView"
-        app:layout_constraintVertical_bias="0.061"
-        android:background="@drawable/ic_videocam_black_24dp" />
+        app:layout_constraintVertical_bias="0.061" />
 
     <TextView
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/main_activity_margin_top"
         android:text="@string/start_video_text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.551"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/server_url_et" />
 
     <TextView
         android:id="@+id/resolution_string_tv"
@@ -46,7 +46,7 @@
         android:id="@+id/minus"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="221dp"
+        android:layout_marginTop="270dp"
         android:layout_marginBottom="193dp"
         android:text="-"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -58,11 +58,23 @@
         android:id="@+id/plus"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="221dp"
+        android:layout_marginTop="270dp"
         android:layout_marginBottom="193dp"
         android:text="+"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/resolution_string_tv"
         app:layout_constraintTop_toBottomOf="@+id/textView" />
+
+    <EditText
+        android:id="@+id/server_url_et"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="150dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="@string/default_server_url"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

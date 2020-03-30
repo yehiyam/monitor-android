@@ -33,7 +33,7 @@ class Publisher implements Runnable {
 
     private final Image mImage;
 
-    private final String SERVER_URL = "http://52.157.71.156";
+    public final String SERVER_URL = "http://52.157.71.156";
 
     private final String UPLOAD_IMAGE_REST_FUNCTION = "monitor_image";
     private final String TAG = "Publisher";
@@ -44,7 +44,8 @@ class Publisher implements Runnable {
      */
 
     public void sendImageInPost(byte[] image, final String imageId, String timeStamp) {
-        String requestUrl = String.format("%s/%s", SERVER_URL, UPLOAD_IMAGE_REST_FUNCTION);
+        String requestUrl = String.format("%s/%s", ((CameraActivity) mActivity).serverUrl, UPLOAD_IMAGE_REST_FUNCTION);
+        Log.d(TAG, "sendImageInPost: " + requestUrl);
 
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
@@ -70,7 +71,7 @@ class Publisher implements Runnable {
         });
 
         final Request request = requestBuilder.build();
-        Log.d(TAG, "sendImageInPost: " + request);
+        Log.e(TAG, "sendImageInPost: " + request);
 
 
 
