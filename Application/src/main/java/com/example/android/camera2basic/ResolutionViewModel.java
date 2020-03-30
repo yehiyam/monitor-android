@@ -9,7 +9,6 @@ public class ResolutionViewModel extends ViewModel {
 
     public ResolutionViewModel() {
         resolutionIndex = new MutableLiveData<>();
-        resolutionIndex.setValue(0);
     }
 
     public MutableLiveData<Integer> getResolutionIndex() {

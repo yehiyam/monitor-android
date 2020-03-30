@@ -518,7 +518,8 @@ public class Camera2BasicFragment extends Fragment
                     continue;
                 }
 
-
+//                if ((CameraActivity)getActivity().preferences)
+//                ((CameraActivity) getActivity()).preference.edit().apply();
                 Size largest = ((CameraActivity) getActivity()).getImageResolution();
 //                ((CameraActivity) getActivity()).setSupportedResolutions(map.getOutputSizes(ImageFormat.JPEG));
 

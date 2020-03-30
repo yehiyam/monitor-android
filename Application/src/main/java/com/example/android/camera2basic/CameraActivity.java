@@ -68,7 +68,7 @@ public class CameraActivity extends AppCompatActivity {
     private Camera2BasicFragment camera2BasicFragment;
 
     Button stopTakingPicturesButton;
-    private SharedPreferences preference;
+    public SharedPreferences preference;
 
     //todo: remove after debug
     private long lastRunTime = 0;
@@ -92,7 +92,7 @@ public class CameraActivity extends AppCompatActivity {
         preference = PreferenceManager.getDefaultSharedPreferences(this);
         imageFrequencyMili = preference.getInt(IMAGE_FREQUENCY_KEY, IMAGE_FREQUENCY_DEFAULT_MILI);
 
-        imageResolution = new Size(800, 600);
+        imageResolution = new Size(1920, 1080);
 
         imageId = preference.getInt(IMAGE_ID_KEY, 1);
 
@@ -173,11 +173,13 @@ public class CameraActivity extends AppCompatActivity {
         }
 
         resolutionViewModel.getResolutionIndex().setValue(Math.min(resolutionViewModel.getResolutionIndex().getValue() + 1, supportedResolution.length - 1));
+        preference.edit().putInt("IMAGE_RESOLUTION_INDEX", resolutionViewModel.getResolutionIndex().getValue()).apply();
 
     }
 
     public void decreaseResolutionValue() {
         resolutionViewModel.getResolutionIndex().setValue(Math.max(resolutionViewModel.getResolutionIndex().getValue() - 1, 0));
+        preference.edit().putInt("IMAGE_RESOLUTION_INDEX", resolutionViewModel.getResolutionIndex().getValue()).apply();
     }
 
 
