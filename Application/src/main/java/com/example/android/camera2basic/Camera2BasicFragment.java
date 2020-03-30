@@ -425,12 +425,6 @@ public class Camera2BasicFragment extends Fragment
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        ((CameraActivity) getActivity()).setSupportedResolutions(getSupportedResolutions());
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_camera2_basic, container, false);
@@ -520,15 +514,16 @@ public class Camera2BasicFragment extends Fragment
 
 //                if ((CameraActivity)getActivity().preferences)
 //                ((CameraActivity) getActivity()).preference.edit().apply();
-                Size largest = ((CameraActivity) getActivity()).getImageResolution();
-//                ((CameraActivity) getActivity()).setSupportedResolutions(map.getOutputSizes(ImageFormat.JPEG));
+                int resolutionIndex = ((CameraActivity) getActivity()).resolutionIndex;
+                Size largest = (map.getOutputSizes(ImageFormat.JPEG))[resolutionIndex];
 
                 // For still image captures, we use the largest available size.
-                if (largest == null) {
-                    largest = Collections.max(
-                            Arrays.asList(map.getOutputSizes(ImageFormat.JPEG)),
-                            new CompareSizesByArea());
-                }
+//                if (largest == null) {
+//                    largest = Collections.max(
+//                            Arrays.asList(map.getOutputSizes(ImageFormat.JPEG)),
+//                            new CompareSizesByArea());
+//                }
+
 
                 Log.d(TAG, "resolution: " + largest);
 

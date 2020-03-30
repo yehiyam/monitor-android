@@ -44,11 +44,6 @@ import java.util.Arrays;
 
 public class CameraActivity extends AppCompatActivity {
 
-    Button resolutionPlus;
-    Button resolutionMinus;
-
-    TextView currentResolution;
-
     public final String TAG = "CameraActivity";
 
     public final String IMAGE_FREQUENCY_KEY = "IMAGE_FREQUENCY";
@@ -73,13 +68,11 @@ public class CameraActivity extends AppCompatActivity {
     //todo: remove after debug
     private long lastRunTime = 0;
 
-    private Size imageResolution;
+    int resolutionIndex;
 
-    private Size[] supportedResolution = null;
 //    int resolutionIndex = 0;
 //    MutableLiveData<Integer> resolutionIndex;
 
-    ResolutionViewModel resolutionViewModel;
 
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -88,11 +81,11 @@ public class CameraActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
 
+
         // load image frequency from shared preference
         preference = PreferenceManager.getDefaultSharedPreferences(this);
         imageFrequencyMili = preference.getInt(IMAGE_FREQUENCY_KEY, IMAGE_FREQUENCY_DEFAULT_MILI);
-
-        imageResolution = new Size(1920, 1080);
+        resolutionIndex = getIntent().getIntExtra(MainActivity.IMAGE_RESOLUTION_INDEX,  0);
 
         imageId = preference.getInt(IMAGE_ID_KEY, 1);
 
@@ -132,54 +125,7 @@ public class CameraActivity extends AppCompatActivity {
         });
 
 
-        resolutionPlus = findViewById(R.id.plus);
-        resolutionMinus = findViewById(R.id.minus);
-        currentResolution = findViewById(R.id.current_resolution_tv);
-
-        final Observer<Integer> resolutionObserver  = new Observer<Integer>() {
-            @Override
-            public void onChanged(Integer integer) {
-
-                imageResolution = supportedResolution[resolutionViewModel.getResolutionIndex().getValue()];
-                currentResolution.setText(imageResolution.toString());
-            }
-        };
-
-
-        resolutionViewModel = ViewModelProviders.of(this).get(ResolutionViewModel.class);
-
-        resolutionViewModel.getResolutionIndex().observe(this, resolutionObserver);
-
-        resolutionPlus.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                decreaseResolutionValue();
-            }
-        });
-
-        resolutionMinus.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                increaseResolutionValue();
-            }
-        });
-
         startTakingPictures();
-    }
-
-    public void increaseResolutionValue() {
-        if (supportedResolution == null) {
-            return;
-        }
-
-        resolutionViewModel.getResolutionIndex().setValue(Math.min(resolutionViewModel.getResolutionIndex().getValue() + 1, supportedResolution.length - 1));
-        preference.edit().putInt("IMAGE_RESOLUTION_INDEX", resolutionViewModel.getResolutionIndex().getValue()).apply();
-
-    }
-
-    public void decreaseResolutionValue() {
-        resolutionViewModel.getResolutionIndex().setValue(Math.max(resolutionViewModel.getResolutionIndex().getValue() - 1, 0));
-        preference.edit().putInt("IMAGE_RESOLUTION_INDEX", resolutionViewModel.getResolutionIndex().getValue()).apply();
     }
 
 
@@ -237,21 +183,4 @@ public class CameraActivity extends AppCompatActivity {
         return imageId;
     }
 
-    public Size getImageResolution() {
-        return imageResolution;
-    }
-
-    public void setImageResolution(Size imageResolution) {
-        this.imageResolution = imageResolution;
-    }
-
-    public Size[] getSupportedResolution() {
-        return supportedResolution;
-    }
-
-    public void setSupportedResolutions(Size[] supportedResolution) {
-        if (supportedResolution != null) {
-            this.supportedResolution = supportedResolution;
-        }
-    }
 }
