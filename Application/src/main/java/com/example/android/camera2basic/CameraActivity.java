@@ -85,7 +85,12 @@ public class CameraActivity extends AppCompatActivity {
         // load image frequency from shared preference
         preference = PreferenceManager.getDefaultSharedPreferences(this);
         imageFrequencyMili = preference.getInt(IMAGE_FREQUENCY_KEY, IMAGE_FREQUENCY_DEFAULT_MILI);
+
         resolutionIndex = getIntent().getIntExtra(MainActivity.IMAGE_RESOLUTION_INDEX,  0);
+        String resolutionString = getIntent().getStringExtra(MainActivity.IMAGE_RESOLUTION_STRING);
+
+        TextView resolutionStringTv = findViewById(R.id.resolution_string_tv);
+        resolutionStringTv.setText(resolutionString);
 
         imageId = preference.getInt(IMAGE_ID_KEY, 1);
 

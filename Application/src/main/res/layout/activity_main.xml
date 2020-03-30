@@ -29,7 +29,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/current_resolution_tv"
+        android:id="@+id/resolution_string_tv"
         android:layout_width="131dp"
         android:layout_height="34dp"
         android:layout_marginStart="29dp"
@@ -50,7 +50,7 @@
         android:layout_marginBottom="193dp"
         android:text="-"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/current_resolution_tv"
+        app:layout_constraintEnd_toStartOf="@+id/resolution_string_tv"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView" />
 
@@ -63,6 +63,6 @@
         android:text="+"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/current_resolution_tv"
+        app:layout_constraintStart_toEndOf="@+id/resolution_string_tv"
         app:layout_constraintTop_toBottomOf="@+id/textView" />
 </androidx.constraintlayout.widget.ConstraintLayout>
