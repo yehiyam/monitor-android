@@ -29,26 +29,15 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/patient_number" />
+        app:layout_constraintTop_toBottomOf="@+id/resolution_string_tv" />
 
     <TextView
-        android:id="@+id/patient_number"
+        android:id="@+id/resolution_string_tv"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="@string/default_patient_number"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/monitor_number" />
-
-    <TextView
-        android:id="@+id/monitor_number"
-        android:layout_width="wrap_content"
-        android:layout_height="@dimen/camera_activity_text_view_high"
-        android:layout_marginTop="44dp"
-
-        android:text="@string/default_patient_number"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_height="28dp"
+        android:layout_marginTop="52dp"
+        app:layout_constraintEnd_toStartOf="@+id/image_frequency_tv"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -56,12 +45,22 @@
         android:id="@+id/stop_taking_pictures_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="@drawable/rounded_rectangle"
         android:text="@string/stop_taking_pictures_button_text"
         android:textColor="@color/buttons_text_colors"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/camera_container"
-        android:background="@drawable/rounded_rectangle"/>
+        app:layout_constraintTop_toBottomOf="@+id/camera_container" />
+
+    <TextView
+        android:id="@+id/image_frequency_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="19dp"
+        android:layout_marginTop="53dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/resolution_string_tv"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

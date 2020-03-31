@@ -45,6 +45,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
@@ -68,6 +69,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
@@ -234,8 +236,6 @@ public class Camera2BasicFragment extends Fragment
      */
     private File mFile;
 
-    private final String id = "111";
-
     /**
      * This a callback object for the {@link ImageReader}. "onImageAvailable" will be called when a
      * still image is ready to be saved.
@@ -247,11 +247,12 @@ public class Camera2BasicFragment extends Fragment
         public void onImageAvailable(ImageReader reader) {
 
             //todo: remove this after testing
-//            mBackgroundHandler.post(new Publisher(reader.acquireNextImage(), id, getActivity()));
-            mBackgroundHandler.post(new ImageSaver(reader.acquireNextImage(), mFile));
+            mBackgroundHandler.post(new Publisher(reader.acquireNextImage(), getActivity()));
+//            mBackgroundHandler.post(new ImageSaver(reader.acquireNextImage(), mFile));
         }
 
     };
+
 
     /**
      * {@link CaptureRequest.Builder} for the camera preview
@@ -437,7 +438,7 @@ public class Camera2BasicFragment extends Fragment
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mFile = new File(getActivity().getExternalFilesDir(null), "pic.jpg");
+        mFile = new File(getActivity().getExternalFilesDir(null), String.valueOf(System.currentTimeMillis()) +".jpg");
     }
 
     @Override
@@ -511,10 +512,22 @@ public class Camera2BasicFragment extends Fragment
                     continue;
                 }
 
+//                if ((CameraActivity)getActivity().preferences)
+//                ((CameraActivity) getActivity()).preference.edit().apply();
+                int resolutionIndex = ((CameraActivity) getActivity()).resolutionIndex;
+                Size largest = (map.getOutputSizes(ImageFormat.JPEG))[resolutionIndex];
+
                 // For still image captures, we use the largest available size.
-                Size largest = Collections.max(
-                        Arrays.asList(map.getOutputSizes(ImageFormat.JPEG)),
-                        new CompareSizesByArea());
+//                if (largest == null) {
+//                    largest = Collections.max(
+//                            Arrays.asList(map.getOutputSizes(ImageFormat.JPEG)),
+//                            new CompareSizesByArea());
+//                }
+
+
+                Log.d(TAG, "resolution: " + largest);
+
+
                 mImageReader = ImageReader.newInstance(largest.getWidth(), largest.getHeight(),
                         ImageFormat.JPEG, /*maxImages*/2);
                 mImageReader.setOnImageAvailableListener(
@@ -599,6 +612,19 @@ public class Camera2BasicFragment extends Fragment
         }
     }
 
+    public Size[] getSupportedResolutions() {
+        CameraManager manager = (CameraManager) getActivity().getSystemService(Context.CAMERA_SERVICE);
+        try {
+            CameraCharacteristics characteristics
+                    = Objects.requireNonNull(manager).getCameraCharacteristics(manager.getCameraIdList()[0]);
+            StreamConfigurationMap map = characteristics.get(
+                    CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
+            return Objects.requireNonNull(map).getOutputSizes(ImageFormat.JPEG);
+        } catch (CameraAccessException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
     /**
      * Opens the camera specified by {@link Camera2BasicFragment#mCameraId}.
      */
@@ -838,7 +864,7 @@ public class Camera2BasicFragment extends Fragment
                 public void onCaptureCompleted(@NonNull CameraCaptureSession session,
                                                @NonNull CaptureRequest request,
                                                @NonNull TotalCaptureResult result) {
-                    showToast("Saved: " + mFile);
+//                    showToast("Saved: " + mFile);
                     Log.d(TAG, mFile.toString());
                     unlockFocus();
                 }

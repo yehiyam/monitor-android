@@ -32,5 +32,8 @@
     <string name="default_patient_number">##########</string>
     <string name="stop_taking_pictures_button_text">הפסק צילום</string>
     <string name="start_video_text">לחץ על הכפתור האדום להתחלת צילום</string>
+    <string name="stop_taking_pictures_dialog">להפסיק צילום?</string>
+    <string name="stop_taking_picture_dialog_keep_taking_pictures">המשך צילום</string>
+    <string name="stop_taking_pictures_dialog_stop_taking_pictures">הפסק צילום</string>
 
 </resources>
