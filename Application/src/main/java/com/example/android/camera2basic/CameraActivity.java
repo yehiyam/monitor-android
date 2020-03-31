@@ -82,6 +82,9 @@ public class CameraActivity extends AppCompatActivity {
         TextView frequencyTv = findViewById(R.id.image_frequency_tv);
         frequencyTv.setText(imageFrequencyMili.toString());
 
+        TextView monitorIdTv = findViewById(R.id.monitor_id_tv);
+        monitorIdTv.setText(monitorId);
+
         imageId = preference.getInt(IMAGE_ID_KEY, 1);
 
         camera2BasicFragment = Camera2BasicFragment.newInstance();

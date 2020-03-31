@@ -24,22 +24,11 @@
         android:id="@+id/camera_container"
         android:name="com.example.android.camera2basic.Camera2BasicFragment"
         android:layout_width="0dp"
-        android:layout_height="500dp"
+        android:layout_height="400dp"
         app:layout_constraintBottom_toTopOf="@+id/stop_taking_pictures_button"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/resolution_string_tv" />
-
-    <TextView
-        android:id="@+id/resolution_string_tv"
-        android:layout_width="wrap_content"
-        android:layout_height="28dp"
-        android:layout_marginTop="52dp"
-        app:layout_constraintEnd_toStartOf="@+id/image_frequency_tv"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/stop_taking_pictures_button"
@@ -50,17 +39,38 @@
         android:textColor="@color/buttons_text_colors"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/camera_container" />
 
     <TextView
+        android:id="@+id/resolution_string_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toStartOf="@+id/monitor_id_tv"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/camera_container"
+        app:layout_constraintVertical_bias="0.66"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
         android:id="@+id/image_frequency_tv"
         android:layout_width="wrap_content"
-        android:layout_height="19dp"
-        android:layout_marginTop="53dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@+id/camera_container"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/monitor_id_tv"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.66" />
+
+    <TextView
+        android:id="@+id/monitor_id_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@+id/camera_container"
+        app:layout_constraintEnd_toStartOf="@+id/image_frequency_tv"
         app:layout_constraintStart_toEndOf="@+id/resolution_string_tv"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.38" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
