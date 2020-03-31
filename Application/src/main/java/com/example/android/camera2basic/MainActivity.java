@@ -3,23 +3,30 @@ package com.example.android.camera2basic;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.preference.PreferenceManager;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.ImageFormat;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.params.StreamConfigurationMap;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.AttributeSet;
 import android.util.Size;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.accessibility.AccessibilityManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -32,13 +39,17 @@ import java.util.Objects;
 
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
-public class MainActivity extends AppCompatActivity implements ZXingScannerView.ResultHandler {
+public class MainActivity extends AppCompatActivity {
 
     public static final String IMAGE_RESOLUTION_INDEX = "IMAGE_RESOLUTION_INDEX";
     public static final String IMAGE_RESOLUTION_STRING = "IMAGE_RESOLUTION_STRING";
     public static final String SERVER_URL_STRING = "SERVER_URL_STRING";
     public static final String IMAGE_FREQUENCY_KEY = "IMAGE_FREQUENCY";
     public static final String MONITOR_ID_KEY = "MONITOR_ID";
+
+    public static final int WRONG_QR_RESULT_CODE = 2;
+
+    public static final int QR_ACTIVITY_REQUEST_CODE = 1;
     public static final int IMAGE_FREQUENCY_DEFAULT_MILI = 2000;
 
     ZXingScannerView mScannerView;
@@ -60,12 +71,23 @@ public class MainActivity extends AppCompatActivity implements ZXingScannerView.
     private String image_resolution_index;
     ViewGroup view;
 
+    private String monitorId;
+
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+//        int MyVersion = Build.VERSION.SDK_INT;
+//        if (MyVersion > Build.VERSION_CODES.LOLLIPOP_MR1) {
+            if (!checkIfAlreadyHavePermission()) {
+                requestForSpecificPermission();
+            }
+//        }
+
+
 
 
         ImageButton startTakingPicturesButton = findViewById(R.id.start_taking_pictures_button);
@@ -87,6 +109,8 @@ public class MainActivity extends AppCompatActivity implements ZXingScannerView.
 
         serverUrlEt = findViewById(R.id.server_url_et);
         serverUrlEt.setText(R.string.default_server_url);
+
+        monitorId = preference.getString(MONITOR_ID_KEY, null);
 
         imageFrequencyEt = findViewById(R.id.image_frequncy_et);
 
@@ -134,9 +158,36 @@ public class MainActivity extends AppCompatActivity implements ZXingScannerView.
 
     }
 
+    private void requestForSpecificPermission() {
+        ActivityCompat.requestPermissions(this,new String[]{
+                Manifest.permission.CAMERA,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+        }, 101);
+    }
+
+    private boolean checkIfAlreadyHavePermission() {
+        int result = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
+        return result == PackageManager.PERMISSION_GRANTED;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case 101:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    //granted
+                } else {
+                    //not granted
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
+
     private  void scanQr() {
-        view = (ViewGroup)getWindow().getDecorView();
-        setContentView(mScannerView);
+        Intent intent = new Intent(this, QrScanActivity.class);
+        startActivityForResult(intent, QR_ACTIVITY_REQUEST_CODE);
     }
 
     public void increaseResolutionValue() {
@@ -155,6 +206,12 @@ public class MainActivity extends AppCompatActivity implements ZXingScannerView.
     }
 
     private void startCameraActivity() {
+
+        if (monitorId == null) {
+            Toast.makeText(this, "לא הוגדר מכשיר, אנא הגדר מכשיר", Toast.LENGTH_LONG).show();
+            return;
+        }
+
         Intent cameraActivityIntent = new Intent(this, CameraActivity.class);
         cameraActivityIntent.putExtra(IMAGE_RESOLUTION_INDEX, resolutionViewModel.getResolutionIndex().getValue());
         cameraActivityIntent.putExtra(IMAGE_RESOLUTION_STRING, supportedResolution[resolutionViewModel.getResolutionIndex().getValue()].toString());
@@ -163,6 +220,7 @@ public class MainActivity extends AppCompatActivity implements ZXingScannerView.
         int imageFrequency = Integer.parseInt(imageFrequencyEt.getText().toString());
         preference.edit().putInt(IMAGE_FREQUENCY_KEY, imageFrequency).apply();
         cameraActivityIntent.putExtra(IMAGE_FREQUENCY_KEY, imageFrequency);
+        cameraActivityIntent.putExtra(MONITOR_ID_KEY, monitorId);
 
         startActivity(cameraActivityIntent);
     }
@@ -181,47 +239,12 @@ public class MainActivity extends AppCompatActivity implements ZXingScannerView.
         return null;
     }
 
-    private void handleWrongQr() {
-        Toast.makeText(this, "wrong qr", Toast.LENGTH_SHORT).show();
-    }
-
     @Override
-    public void handleResult(Result result) {
-        setContentView(view);
-//        setContentView(R.layout.activity_main);
-        String monitorId = result.getText();
-
-        if  (!monitorId.startsWith(getString(R.string.qr_monitor_prefix))) {
-            handleWrongQr();
-        } else {
-            Toast.makeText(this, monitorId, Toast.LENGTH_SHORT);
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == Activity.RESULT_OK && data != null) {
+            monitorId = data.getStringExtra(MONITOR_ID_KEY);
             preference.edit().putString(MONITOR_ID_KEY, monitorId).apply();
         }
     }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        mScannerView.setResultHandler(this); // Register ourselves as a handler for scan results.
-        mScannerView.startCamera();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        mScannerView.stopCamera();           // Stop camera on pa// use
-    }
-
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull String name, @NonNull Context context, @NonNull AttributeSet attrs) {
-//        View view = super.onCreateView(name, context, attrs);
-        View view =
-        view = View.inflate()
-    }
-
-    public View setUpView() {
-
-    }
-
 }
