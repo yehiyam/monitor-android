@@ -35,5 +35,6 @@
     <string name="stop_taking_pictures_dialog">להפסיק צילום?</string>
     <string name="stop_taking_picture_dialog_keep_taking_pictures">המשך צילום</string>
     <string name="stop_taking_pictures_dialog_stop_taking_pictures">הפסק צילום</string>
+    <string name="qr_monitor_prefix">cvmonitor</string>
 
 </resources>
