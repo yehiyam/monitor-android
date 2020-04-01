@@ -1,10 +1,12 @@
 package com.example.android.camera2basic;
 
+
 import java.util.logging.Logger;
 
 public class Log4jHelper {
 
-    private final static LogConfigurator _logConfigurator = new LogConfigurator();
+    private final static logConfigurator  _logConfigurator = new LogConfigurator();
+
 
     public static void Configure(String fileName, String filePattern,
                                  int maxBackupSize, long maxFileSize) {
