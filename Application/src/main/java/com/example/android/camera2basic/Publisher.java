@@ -6,6 +6,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -26,14 +27,14 @@ class Publisher implements Runnable {
     public static final String IMAGE_ID_KEY = "X-IMAGE-ID";
     public static final String TIME_STAMP_KEY = "X-TIMESTAMP";
 
+    org.slf4j.Logger logger = LoggerFactory.getLogger(MainActivity.class);
+
 
     /**
      * The JPEG image
      */
 
     private final Image mImage;
-
-    public final String SERVER_URL = "http://52.157.71.156";
 
     private final String UPLOAD_IMAGE_REST_FUNCTION = "monitor_image";
     private final String TAG = "Publisher";
@@ -72,6 +73,7 @@ class Publisher implements Runnable {
 
         final Request request = requestBuilder.build();
         Log.e(TAG, "sendImageInPost: " + request);
+        logger.info(request.toString());
 
 
 
@@ -124,9 +126,9 @@ class Publisher implements Runnable {
 
     Publisher(Image image, Activity activity) {
         mImage = image;
-
         //todo: yakir look on this
         mActivity = activity;
+        logger.info("create publisher");
     }
 
     @Override
