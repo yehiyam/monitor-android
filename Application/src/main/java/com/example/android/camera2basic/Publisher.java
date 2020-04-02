@@ -6,6 +6,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -27,6 +28,8 @@ class Publisher implements Runnable {
     public static final String TIME_STAMP_KEY = "X-TIMESTAMP";
     public static final String MONITOR_ID_KEY = "X-MONITOR-ID";
 
+    org.slf4j.Logger logger = LoggerFactory.getLogger(MainActivity.class);
+
 
     /**
      * The JPEG image
@@ -44,7 +47,6 @@ class Publisher implements Runnable {
 
     public void sendImageInPost(byte[] image, final String imageId, String monitorId, String timeStamp) {
         String requestUrl = String.format("%s/%s", ((CameraActivity) mActivity).serverUrl, UPLOAD_IMAGE_REST_FUNCTION);
-        Log.d(TAG, "sendImageInPost: " + requestUrl);
 
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
@@ -74,19 +76,23 @@ class Publisher implements Runnable {
         });
 
         final Request request = requestBuilder.build();
-        Log.e(TAG, "sendImageInPost: " + request);
+        logger.info(request.toString());
 
 
         //todo add check that the response is correct
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                if (e instanceof java.net.SocketTimeoutException) {
+                    logger.info("timeout: " + call.request().header(IMAGE_ID_KEY));
+                } else {
+                    logger.error(e.toString());
+                }
                 e.printStackTrace();
                 mActivity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         Toast.makeText(mActivity, String.format("%s: did not get response", imageId) , Toast.LENGTH_SHORT).show();
-                        Log.d(TAG, String.format("%s: did not get response", imageId));
                     }
                 });
             }
@@ -96,7 +102,7 @@ class Publisher implements Runnable {
                 mActivity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Log.d(TAG, "run: " + response);
+                        logger.info(response.toString());
                         Toast.makeText(mActivity, String.format("%s: got return code: " + response.code(), imageId), Toast.LENGTH_LONG).show();
                     }
                 });
@@ -126,8 +132,6 @@ class Publisher implements Runnable {
 
     Publisher(Image image, Activity activity) {
         mImage = image;
-
-        //todo: yakir look on this
         mActivity = activity;
     }
 

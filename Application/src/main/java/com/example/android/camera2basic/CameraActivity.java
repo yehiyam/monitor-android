@@ -31,7 +31,11 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
 
+import org.slf4j.LoggerFactory;
+
 public class CameraActivity extends AppCompatActivity {
+
+    org.slf4j.Logger logger = LoggerFactory.getLogger(MainActivity.class);
 
     public final String TAG = "CameraActivity";
 
@@ -105,7 +109,7 @@ public class CameraActivity extends AppCompatActivity {
         takingPicturesRunnable = new Runnable() {
             @Override
             public void run() {
-                Log.d(TAG, "run: taking picture");
+                logger.info("taking picture");
                 camera2BasicFragment.takePicture();
 
                 //todo: remove after debug
@@ -133,7 +137,8 @@ public class CameraActivity extends AppCompatActivity {
 
     public void startTakingPictures() {
         if (!handler.hasCallbacks(takingPicturesRunnable)) {
-            Log.i(TAG, "startTakingPictures");
+//            logger.info(String.format("start taking pictures: monitor-id: %s resolution: %s frequency: %s",
+//                    ));
             handler.postDelayed(takingPicturesRunnable, DELAY_BEFORE_TAKING_PICTURES_MILLIS);
         }
     }
