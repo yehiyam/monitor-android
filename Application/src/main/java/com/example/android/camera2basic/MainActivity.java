@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.preference.PreferenceManager;
@@ -16,6 +17,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.ImageFormat;
+import android.graphics.Rect;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraManager;
@@ -23,6 +25,7 @@ import android.hardware.camera2.params.StreamConfigurationMap;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.Size;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,11 +36,21 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import com.google.zxing.Result;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.Objects;
 
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -46,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
     public static final String SERVER_URL_STRING = "SERVER_URL_STRING";
     public static final String IMAGE_FREQUENCY_KEY = "IMAGE_FREQUENCY";
     public static final String MONITOR_ID_KEY = "MONITOR_ID";
+    public static final String GET_MONITOR_DATA_REST = "MONITOR_ID";
 
     public static final int WRONG_QR_RESULT_CODE = 2;
 
@@ -71,8 +85,10 @@ public class MainActivity extends AppCompatActivity {
     private String image_resolution_index;
     ViewGroup view;
 
-    private String monitorId;
+    HashMap<String, Rect> croppingMap;
 
+    private String monitorId;
+    private NetworkManager networkManager;
 
 
     @Override
@@ -97,6 +113,27 @@ public class MainActivity extends AppCompatActivity {
                 startCameraActivity();
             }
         });
+
+
+        networkManager = new NetworkManager();
+        networkManager.getMonitorData(getString(R.string.default_server_url), "cvmonitors-respirator-295f4b34d7894ab9", new Callback() {
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                String stringJson = response.body().string();
+                Log.d("TAG", "onResponse: " + stringJson);
+                Gson gson = new GsonBuilder()
+                        .serializeNulls()
+                        .registerTypeAdapter(HashMap.class, new GsonSerializations.CroppingHashMapDeSerializer())
+                        .create();
+                HashMap<String, Rect> croppingMap= gson.fromJson(stringJson, new TypeToken<HashMap<String, Rect>>(){}.getType());
+            }
+        });
+
 
         preference = PreferenceManager.getDefaultSharedPreferences(this);
 

@@ -24,8 +24,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
 import android.graphics.Matrix;
 import android.graphics.Point;
@@ -46,9 +44,16 @@ import android.media.ImageReader;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
+import androidx.core.content.ContextCompat;
+
+import android.speech.tts.SynthesisCallback;
 import android.util.Log;
 import android.util.Size;
-import android.util.SparseArray;
 import android.util.SparseIntArray;
 import android.view.LayoutInflater;
 import android.view.Surface;
@@ -57,26 +62,25 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.google.android.gms.vision.Frame;
-import com.google.android.gms.vision.text.TextBlock;
+//import org.slf4j.LoggerFactory;
+
 import com.google.android.gms.vision.text.TextRecognizer;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.Fragment;
+//import static com.example.android.camera2basic.App.staticLogger;
 
 public class Camera2BasicFragment extends Fragment
         implements ActivityCompat.OnRequestPermissionsResultCallback {
@@ -84,6 +88,7 @@ public class Camera2BasicFragment extends Fragment
     /**
      * Conversion from screen rotation to JPEG orientation.
      */
+
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
     private static final int REQUEST_CAMERA_PERMISSION = 1;
     private static final String FRAGMENT_DIALOG = "dialog";
@@ -250,67 +255,13 @@ public class Camera2BasicFragment extends Fragment
 
         @Override
         public void onImageAvailable(ImageReader reader) {
-           imageTreatment(reader);
-
+            HashMap<String, String> measurements = imageTreatment.getAllMeasurement(reader);
+            Log.d(TAG, "onImageAvailable: " + measurements);
             //todo: remove this after testing
-            // mBackgroundHandler.post(new Publisher(reader.acquireNextImage(), getActivity()));
+//            mBackgroundHandler.post(new Publisher(reader.acquireNextImage(), getActivity()));
         }
 
     };
-
-    private void imageTreatment(ImageReader reader)
-    {
-        Bitmap bitmap = convertImageReaderToBitmap(reader);
-        Crop(bitmap);
-        StringBuilder stringBuilder = RecognizeText(bitmap);
-    }
-
-    private Bitmap convertImageReaderToBitmap(ImageReader reader)
-    {
-        try {
-            Image image = reader.acquireLatestImage();
-
-            ByteBuffer buffer = image.getPlanes()[0].getBuffer();
-            byte[] bytes = new byte[buffer.remaining()];
-            buffer.get(bytes);
-
-            Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-            return bitmap;
-        }
-        catch (Exception e)
-        {
-            //Log
-            return null;
-        }
-    }
-
-    private void Crop(Bitmap bitmap) {
-    }
-
-    private StringBuilder RecognizeText(Bitmap bitmap) {
-        try {
-            Frame.Builder f = new Frame.Builder();
-            f.setBitmap(bitmap);
-
-            SparseArray<TextBlock> dataReco = textRecognizer.detect(f.build());
-
-            StringBuilder stringBuilder = new StringBuilder();
-            for(int i=0;i<dataReco.size();i++){
-                TextBlock item = dataReco.valueAt(i);
-                stringBuilder.append(item.getValue());
-                stringBuilder.append("\n");
-            }
-
-            return stringBuilder;
-        }
-        catch (Exception e)
-        {
-            //lOG
-        }
-
-        return null;
-
-    }
 
 
     /**
@@ -412,6 +363,7 @@ public class Camera2BasicFragment extends Fragment
         }
 
     };
+    private ImageTreatment imageTreatment;
 
     /**
      * Shows a {@link Toast} on the UI thread.
@@ -474,7 +426,7 @@ public class Camera2BasicFragment extends Fragment
         } else if (notBigEnough.size() > 0) {
             return Collections.max(notBigEnough, new CompareSizesByArea());
         } else {
-            Log.e(TAG, "Couldn't find any suitable preview size");
+//            staticLogger.error("Couldn't find any suitable preview size");
             return choices[0];
         }
     }
@@ -483,36 +435,23 @@ public class Camera2BasicFragment extends Fragment
         return new Camera2BasicFragment();
     }
 
-//    @Override
-//    public void onCreate(@Nullable Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        SimpleOrientationListener mOrientationListener = new SimpleOrientationListener(
-//                getActivity()) {
-//
-//            @Override
-//            public void onSimpleOrientationChanged(int orientation) {
-//                if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-//
-//                } else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-//
-//                }
-//            }
-//        };
-//        mOrientationListener.enable();
-//    }
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_camera2_basic, container, false);
+//        TextRecognizer textRecognizer = new TextRecognizer.Builder(view.getContext()).build();
+//        imageTreatment = new ImageTreatment(((CameraActivity)getActivity()).croppingMap, textRecognizer, getActivity());
+        return view;
+        }
 
-        return inflater.inflate(R.layout.fragment_camera2_basic, container, false);
-    }
-
-    TextRecognizer textRecognizer ;
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
         mTextureView = (AutoFitTextureView) view.findViewById(R.id.texture);
-        textRecognizer = new TextRecognizer.Builder(getActivity().getApplicationContext()).build();
     }
 
     @Override
@@ -604,10 +543,6 @@ public class Camera2BasicFragment extends Fragment
 //                            new CompareSizesByArea());
 //                }
 
-
-                Log.d(TAG, "resolution: " + largest);
-
-
                 mImageReader = ImageReader.newInstance(largest.getWidth(), largest.getHeight(),
                         ImageFormat.JPEG, /*maxImages*/2);
                 mImageReader.setOnImageAvailableListener(
@@ -616,7 +551,6 @@ public class Camera2BasicFragment extends Fragment
                 // Find out if we need to swap dimension to get the preview size relative to sensor
                 // coordinate.
                 int displayRotation = activity.getWindowManager().getDefaultDisplay().getRotation();
-                Log.d(TAG, "setUpCameraOutputs: " + displayRotation);
                 //noinspection ConstantConditions
                 mSensorOrientation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
                 boolean swappedDimensions = false;
@@ -945,8 +879,6 @@ public class Camera2BasicFragment extends Fragment
                 public void onCaptureCompleted(@NonNull CameraCaptureSession session,
                                                @NonNull CaptureRequest request,
                                                @NonNull TotalCaptureResult result) {
-//                    showToast("Saved: " + mFile);
-                    Log.d(TAG, mFile.toString());
                     unlockFocus();
                 }
             };
