@@ -87,7 +87,9 @@ public class CameraActivity extends AppCompatActivity {
 
         imageId = preference.getInt(IMAGE_ID_KEY, 1);
 
-        camera2BasicFragment = Camera2BasicFragment.newInstance();
+//        camera2BasicFragment = Camera2BasicFragment.newInstance();
+        camera2BasicFragment = new Camera2BasicFragment();
+
         stopTakingPicturesButton = findViewById(R.id.stop_taking_pictures_button);
 
 
@@ -104,6 +106,7 @@ public class CameraActivity extends AppCompatActivity {
         takingPicturesRunnable = new Runnable() {
             @Override
             public void run() {
+                Log.d(TAG, "run: taking picture");
                 camera2BasicFragment.takePicture();
 
                 //todo: remove after debug
@@ -123,7 +126,7 @@ public class CameraActivity extends AppCompatActivity {
         });
 
 
-        startTakingPictures();
+//        startTakingPictures();
     }
 
 
