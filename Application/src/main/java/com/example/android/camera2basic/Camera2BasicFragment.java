@@ -248,7 +248,6 @@ public class Camera2BasicFragment extends Fragment
 
             //todo: remove this after testing
             mBackgroundHandler.post(new Publisher(reader.acquireNextImage(), getActivity()));
-//            mBackgroundHandler.post(new ImageSaver(reader.acquireNextImage(), mFile));
         }
 
     };
@@ -424,6 +423,24 @@ public class Camera2BasicFragment extends Fragment
         return new Camera2BasicFragment();
     }
 
+//    @Override
+//    public void onCreate(@Nullable Bundle savedInstanceState) {
+//        super.onCreate(savedInstanceState);
+//        SimpleOrientationListener mOrientationListener = new SimpleOrientationListener(
+//                getActivity()) {
+//
+//            @Override
+//            public void onSimpleOrientationChanged(int orientation) {
+//                if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+//
+//                } else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+//
+//                }
+//            }
+//        };
+//        mOrientationListener.enable();
+//    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -536,6 +553,7 @@ public class Camera2BasicFragment extends Fragment
                 // Find out if we need to swap dimension to get the preview size relative to sensor
                 // coordinate.
                 int displayRotation = activity.getWindowManager().getDefaultDisplay().getRotation();
+                Log.d(TAG, "setUpCameraOutputs: " + displayRotation);
                 //noinspection ConstantConditions
                 mSensorOrientation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
                 boolean swappedDimensions = false;
@@ -997,47 +1015,4 @@ public class Camera2BasicFragment extends Fragment
                     .create();
         }
     }
-
-
-    private static class ImageSaver implements Runnable {
-
-        /**
-         * The JPEG image
-         */
-        private final Image mImage;
-        /**
-         * The file we save the image into.
-         */
-        private final File mFile;
-
-        ImageSaver(Image image, File file) {
-            mImage = image;
-            mFile = file;
-        }
-
-        @Override
-        public void run() {
-            ByteBuffer buffer = mImage.getPlanes()[0].getBuffer();
-            byte[] bytes = new byte[buffer.remaining()];
-            buffer.get(bytes);
-            FileOutputStream output = null;
-            try {
-                output = new FileOutputStream(mFile);
-                output.write(bytes);
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                mImage.close();
-                if (null != output) {
-                    try {
-                        output.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }
-
-    }
-
 }
