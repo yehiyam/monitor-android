@@ -84,23 +84,10 @@ public class CameraActivity extends AppCompatActivity {
         setContentView(R.layout.activity_camera);
 
         networkManager = new NetworkManager();
-        networkManager.getMonitorData(getString(R.string.default_server_url), "cvmonitors-respirator-295f4b34d7894ab9", new Callback() {
-                    @Override
-                    public void onFailure(@NotNull Call call, @NotNull IOException e) {
 
-                    }
-
-                    @Override
-                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                        String stringJson = response.body().string();
-                        Log.d("TAG", "onResponse: " + stringJson);
-                        Gson gson = new GsonBuilder()
-                                .serializeNulls()
-                                .registerTypeAdapter(HashMap.class, new GsonSerializations.CroppingHashMapDeSerializer())
-                                .create();
-                        croppingMap = gson.fromJson(stringJson, new TypeToken<HashMap<String, Rect>>(){}.getType());
-                    }
-                });
+//        croppingMap = new HashMap<>();
+//        croppingMap.put("up", new Rect(50, 50,400,400));
+//        croppingMap.put("down", new Rect(450, 450,800,800));
 
                 // load image frequency from shared preference
         preference = PreferenceManager.getDefaultSharedPreferences(this);
@@ -110,6 +97,25 @@ public class CameraActivity extends AppCompatActivity {
         monitorId = getIntent().getStringExtra(MainActivity.MONITOR_ID_KEY);
 
         serverUrl = getIntent().getStringExtra(MainActivity.SERVER_URL_STRING);
+
+        networkManager.getMonitorData(serverUrl, monitorId, new Callback() {
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                String stringJson = response.body().string();
+                Log.d("TAG", "onResponse: " + stringJson);
+                Gson gson = new GsonBuilder()
+                        .serializeNulls()
+                        .registerTypeAdapter(HashMap.class, new GsonSerializations.CroppingHashMapDeSerializer())
+                        .create();
+                croppingMap = gson.fromJson(stringJson, new TypeToken<HashMap<String, Rect>>(){}.getType());
+                Log.d(TAG, "onResponse: ");
+            }
+        });
 
         TextView resolutionStringTv = findViewById(R.id.resolution_string_tv);
         resolutionStringTv.setText(resolutionString);
@@ -155,7 +161,8 @@ public class CameraActivity extends AppCompatActivity {
         stopTakingPicturesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                stopTakingPicturesDialog();
+                camera2BasicFragment.takePicture();
+//                stopTakingPicturesDialog();
             }
         });
     }
@@ -167,10 +174,11 @@ public class CameraActivity extends AppCompatActivity {
     }
 
     public void startTakingPictures() {
-        if (!handler.hasCallbacks(takingPicturesRunnable)) {
-            Log.i(TAG, "startTakingPictures");
-            handler.postDelayed(takingPicturesRunnable, DELAY_BEFORE_TAKING_PICTURES_MILLIS);
-        }
+//        camera2BasicFragment.takePicture();
+//        if (!handler.hasCallbacks(takingPicturesRunnable)) {
+//            Log.i(TAG, "startTakingPictures");
+//            handler.postDelayed(takingPicturesRunnable, DELAY_BEFORE_TAKING_PICTURES_MILLIS);
+//        }
     }
 
     public void stopTakingPictures() {

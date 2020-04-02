@@ -256,8 +256,9 @@ public class Camera2BasicFragment extends Fragment
         @Override
         public void onImageAvailable(ImageReader reader) {
             HashMap<String, String> measurements = imageTreatment.getAllMeasurement(reader);
-            Log.d(TAG, "onImageAvailable: " + measurements);
+            Log.d(TAG, "measurmenets " + measurements);
             //todo: remove this after testing
+//            mBackgroundHandler.post(new )
 //            mBackgroundHandler.post(new Publisher(reader.acquireNextImage(), getActivity()));
         }
 
@@ -364,6 +365,7 @@ public class Camera2BasicFragment extends Fragment
 
     };
     private ImageTreatment imageTreatment;
+    private TextRecognizer textRecognizer;
 
     /**
      * Shows a {@link Toast} on the UI thread.
@@ -436,22 +438,17 @@ public class Camera2BasicFragment extends Fragment
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_camera2_basic, container, false);
-//        TextRecognizer textRecognizer = new TextRecognizer.Builder(view.getContext()).build();
-//        imageTreatment = new ImageTreatment(((CameraActivity)getActivity()).croppingMap, textRecognizer, getActivity());
         return view;
         }
 
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
         mTextureView = (AutoFitTextureView) view.findViewById(R.id.texture);
+        textRecognizer = new TextRecognizer.Builder(getActivity().getApplicationContext()).build();
+        imageTreatment = new ImageTreatment(((CameraActivity)getActivity()).croppingMap, textRecognizer, getActivity());
     }
 
     @Override

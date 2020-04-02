@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Rect;
 import android.media.Image;
 import android.media.ImageReader;
+import android.util.Log;
 import android.util.SparseArray;
 
 import com.google.android.gms.vision.Frame;
@@ -43,6 +44,10 @@ public class ImageTreatment {
     public HashMap<String, String> getAllMeasurement(ImageReader reader)
     {
         Bitmap bitmap = convertImageReaderToBitmap(reader);
+        File f = new File(mActivity.getExternalFilesDir(null), "test.jpg");
+        bitmap =  BitmapFactory.decodeFile(f.getAbsolutePath());
+//        String dataReco = RecognizeText(bitmap);
+//        RecognizeText(bitmap);
         HashMap<String, String> measurementHash = new HashMap<>();
         for (Map.Entry<String, Rect> entry : croppingMap.entrySet()) {
             measurementHash.put(entry.getKey(), getMeasurement(bitmap, entry.getValue()));
@@ -72,7 +77,11 @@ public class ImageTreatment {
 
 
     private Bitmap Crop(Bitmap bitmap, Rect rect) {
-        bitmap = Bitmap.createBitmap(bitmap, rect.left, rect.top, rect.width(), rect.height());
+//        try {
+            bitmap = Bitmap.createBitmap(bitmap, rect.left, rect.top, rect.width(), rect.height());
+//        } catch (IllegalArgumentException e) {
+//
+//        }
         saveImage(bitmap);
         return bitmap;
     }
@@ -82,23 +91,22 @@ public class ImageTreatment {
         try {
             Frame.Builder f = new Frame.Builder();
             f.setBitmap(bitmap);
-
-            SparseArray<TextBlock> dataReco = textRecognizer.detect(f.build());
-
+            SparseArray<TextBlock> dataReco = null;
+            dataReco = textRecognizer.detect(f.build());
+            Log.d("textRecognizer", "RecognizeText: " + dataReco);
             // todo put null or empty
             if (dataReco == null || dataReco.size() != 1) {
                 return null;
             }
-            return dataReco.get(0).toString();
 
-//            StringBuilder stringBuilder = new StringBuilder();
-//            for(int i=0;i<dataReco.size();i++){
-//                TextBlock item = dataReco.valueAt(i);
-//                stringBuilder.append(item.getValue());
-//                stringBuilder.append("\n");
-//            }
-//
-//            return stringBuilder;
+            StringBuilder stringBuilder = new StringBuilder();
+            for(int i=0;i<dataReco.size();i++){
+                TextBlock item = dataReco.valueAt(i);
+                stringBuilder.append(item.getValue());
+                stringBuilder.append("\n");
+            }
+
+            return stringBuilder.toString();
         }
         catch (Exception e)
         {
@@ -111,7 +119,7 @@ public class ImageTreatment {
 
     public void saveImage(Bitmap bmp) {
         FileOutputStream output = null;
-        File filename = new File(mActivity.getExternalFilesDir(null), ((CameraActivity) mActivity).getImageId() + ".jpg");
+        File filename = new File(mActivity.getExternalFilesDir(null), System.currentTimeMillis() + ".jpg");
         try (FileOutputStream out = new FileOutputStream(filename)) {
             bmp.compress(Bitmap.CompressFormat.PNG, 1, out); // bmp is your Bitmap instance
             // PNG is a lossless format, the compression factor (100) is ignored
