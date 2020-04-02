@@ -26,6 +26,7 @@ class Publisher implements Runnable {
 
     public static final String IMAGE_ID_KEY = "X-IMAGE-ID";
     public static final String TIME_STAMP_KEY = "X-TIMESTAMP";
+    public static final String MONITOR_ID_KEY = "X-MONITOR-ID";
 
     org.slf4j.Logger logger = LoggerFactory.getLogger(MainActivity.class);
 
@@ -44,7 +45,7 @@ class Publisher implements Runnable {
      * @return
      */
 
-    public void sendImageInPost(byte[] image, final String imageId, String timeStamp) {
+    public void sendImageInPost(byte[] image, final String imageId, String monitorId, String timeStamp) {
         String requestUrl = String.format("%s/%s", ((CameraActivity) mActivity).serverUrl, UPLOAD_IMAGE_REST_FUNCTION);
 
         OkHttpClient client = new OkHttpClient().newBuilder()
@@ -63,6 +64,10 @@ class Publisher implements Runnable {
             requestBuilder.addHeader(TIME_STAMP_KEY, timeStamp);
         }
 
+        if (monitorId != null) {
+            requestBuilder.addHeader(MONITOR_ID_KEY, monitorId);
+        }
+
         mActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -72,7 +77,6 @@ class Publisher implements Runnable {
 
         final Request request = requestBuilder.build();
         logger.info(request.toString());
-
 
 
         //todo add check that the response is correct
@@ -136,7 +140,11 @@ class Publisher implements Runnable {
         ByteBuffer buffer = mImage.getPlanes()[0].getBuffer();
         byte[] bytes = new byte[buffer.remaining()];
         buffer.get(bytes);
-        sendImageInPost(bytes, String.valueOf( ((CameraActivity) mActivity).getImageId()), String.valueOf(System.currentTimeMillis()));
+        sendImageInPost(
+                bytes,
+                String.valueOf( ((CameraActivity) mActivity).getImageId()),
+                String.valueOf( ((CameraActivity) mActivity).monitorId),
+                String.valueOf(System.currentTimeMillis()));
         saveImage(bytes);
         ((CameraActivity) mActivity).addToImageIdCounter();
         mImage.close();

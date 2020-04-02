@@ -39,12 +39,9 @@ public class CameraActivity extends AppCompatActivity {
 
     public final String TAG = "CameraActivity";
 
-    public final String IMAGE_FREQUENCY_KEY = "IMAGE_FREQUENCY";
-    public final int IMAGE_FREQUENCY_DEFAULT_MILI = 2000;
-
     public final int DELAY_BEFORE_TAKING_PICTURES_MILLIS = 4000;
 
-    public int imageFrequencyMili;
+    public Integer imageFrequencyMili;
 
     String IMAGE_ID_KEY = "image_ID";
     int imageId;
@@ -64,10 +61,7 @@ public class CameraActivity extends AppCompatActivity {
     int resolutionIndex;
 
     public String serverUrl;
-
-//    int resolutionIndex = 0;
-//    MutableLiveData<Integer> resolutionIndex;
-
+    public String monitorId;
 
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -79,21 +73,26 @@ public class CameraActivity extends AppCompatActivity {
 
         // load image frequency from shared preference
         preference = PreferenceManager.getDefaultSharedPreferences(this);
-        imageFrequencyMili = preference.getInt(IMAGE_FREQUENCY_KEY, IMAGE_FREQUENCY_DEFAULT_MILI);
-
+        imageFrequencyMili = getIntent().getIntExtra(MainActivity.IMAGE_FREQUENCY_KEY, 3000);
         resolutionIndex = getIntent().getIntExtra(MainActivity.IMAGE_RESOLUTION_INDEX,  0);
         String resolutionString = getIntent().getStringExtra(MainActivity.IMAGE_RESOLUTION_STRING);
+        monitorId = getIntent().getStringExtra(MainActivity.MONITOR_ID_KEY);
 
         serverUrl = getIntent().getStringExtra(MainActivity.SERVER_URL_STRING);
-
-        updateImageFrequency(IMAGE_FREQUENCY_DEFAULT_MILI);
 
         TextView resolutionStringTv = findViewById(R.id.resolution_string_tv);
         resolutionStringTv.setText(resolutionString);
 
+        TextView frequencyTv = findViewById(R.id.image_frequency_tv);
+        frequencyTv.setText(imageFrequencyMili.toString());
+
+        TextView monitorIdTv = findViewById(R.id.monitor_id_tv);
+        monitorIdTv.setText(monitorId);
+
         imageId = preference.getInt(IMAGE_ID_KEY, 1);
 
         camera2BasicFragment = Camera2BasicFragment.newInstance();
+
         stopTakingPicturesButton = findViewById(R.id.stop_taking_pictures_button);
 
 
@@ -128,20 +127,12 @@ public class CameraActivity extends AppCompatActivity {
                 stopTakingPicturesDialog();
             }
         });
-
-
-        startTakingPictures();
     }
 
 
     public void addToImageIdCounter() {
         imageId += 1;
         preference.edit().putInt(IMAGE_ID_KEY, imageId).apply();
-    }
-
-    public void updateImageFrequency(int frequency) {
-        imageFrequencyMili = frequency;
-        preference.edit().putInt(IMAGE_FREQUENCY_KEY, imageFrequencyMili).apply();
     }
 
     public void startTakingPictures() {

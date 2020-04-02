@@ -23,8 +23,8 @@
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/camera_container"
         android:name="com.example.android.camera2basic.Camera2BasicFragment"
-        android:layout_width="0dp"
-        android:layout_height="400dp"
+        android:layout_width="740dp"
+        android:layout_height="228dp"
         app:layout_constraintBottom_toTopOf="@+id/stop_taking_pictures_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
