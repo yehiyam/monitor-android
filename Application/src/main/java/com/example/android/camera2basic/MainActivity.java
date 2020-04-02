@@ -1,5 +1,6 @@
 package com.example.android.camera2basic;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
@@ -9,10 +10,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.ImageFormat;
+import android.graphics.Path;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.params.StreamConfigurationMap;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Size;
 import android.view.View;
@@ -23,6 +26,8 @@ import android.widget.TextView;
 
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.nio.file.Paths;
 import java.util.Objects;
 
 import ch.qos.logback.classic.Logger;
@@ -106,7 +111,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        configureLogbackDirectly();
         startCameraActivity();
 
     }
@@ -149,41 +153,4 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
-    private void configureLogbackDirectly() {
-
-        // reset the default context (which may already have been initialized)
-        // since we want to reconfigure it
-        LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
-        lc.stop();
-
-        // setup FileAppender
-        PatternLayoutEncoder encoder1 = new PatternLayoutEncoder();
-        encoder1.setContext(lc);
-        encoder1.setPattern("%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n");
-        encoder1.start();
-
-        FileAppender<ILoggingEvent> fileAppender = new FileAppender<ILoggingEvent>();
-        fileAppender.setContext(lc);
-        fileAppender.setFile(this.getFileStreamPath("app.log").getAbsolutePath());
-        fileAppender.setEncoder(encoder1);
-        fileAppender.start();
-
-        // setup LogcatAppender
-        PatternLayoutEncoder encoder2 = new PatternLayoutEncoder();
-        encoder2.setContext(lc);
-        encoder2.setPattern("[%thread] %msg%n");
-        encoder2.start();
-
-        LogcatAppender logcatAppender = new LogcatAppender();
-        logcatAppender.setContext(lc);
-        logcatAppender.setEncoder(encoder2);
-        logcatAppender.start();
-
-        // add the newly created appenders to the root logger;
-        // qualify Logger to disambiguate from org.slf4j.Logger
-        ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
-        root.addAppender(fileAppender);
-        root.addAppender(logcatAppender);
-    }
 }
