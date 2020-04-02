@@ -87,8 +87,7 @@ public class CameraActivity extends AppCompatActivity {
 
         imageId = preference.getInt(IMAGE_ID_KEY, 1);
 
-//        camera2BasicFragment = Camera2BasicFragment.newInstance();
-        camera2BasicFragment = new Camera2BasicFragment();
+        camera2BasicFragment = Camera2BasicFragment.newInstance();
 
         stopTakingPicturesButton = findViewById(R.id.stop_taking_pictures_button);
 
@@ -124,9 +123,6 @@ public class CameraActivity extends AppCompatActivity {
                 stopTakingPicturesDialog();
             }
         });
-
-
-//        startTakingPictures();
     }
 
 
@@ -134,11 +130,6 @@ public class CameraActivity extends AppCompatActivity {
         imageId += 1;
         preference.edit().putInt(IMAGE_ID_KEY, imageId).apply();
     }
-
-//    public void updateImageFrequency(int frequency) {
-//        imageFrequencyMili = frequency;
-//        preference.edit().putInt(IMAGE_FREQUENCY_KEY, imageFrequencyMili).apply();
-//    }
 
     public void startTakingPictures() {
         if (!handler.hasCallbacks(takingPicturesRunnable)) {

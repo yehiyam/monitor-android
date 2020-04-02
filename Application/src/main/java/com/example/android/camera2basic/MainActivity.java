@@ -80,12 +80,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-//        int MyVersion = Build.VERSION.SDK_INT;
-//        if (MyVersion > Build.VERSION_CODES.LOLLIPOP_MR1) {
+        int MyVersion = Build.VERSION.SDK_INT;
+        if (MyVersion > Build.VERSION_CODES.LOLLIPOP_MR1) {
             if (!checkIfAlreadyHavePermission()) {
                 requestForSpecificPermission();
             }
-//        }
+        }
 
 
 
