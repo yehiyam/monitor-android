@@ -24,6 +24,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
 import android.graphics.Matrix;
 import android.graphics.Point;
@@ -44,14 +46,9 @@ import android.media.ImageReader;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
-import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.Fragment;
-import androidx.core.content.ContextCompat;
 import android.util.Log;
 import android.util.Size;
+import android.util.SparseArray;
 import android.util.SparseIntArray;
 import android.view.LayoutInflater;
 import android.view.Surface;
@@ -60,9 +57,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.google.android.gms.vision.Frame;
+import com.google.android.gms.vision.text.TextBlock;
+import com.google.android.gms.vision.text.TextRecognizer;
+
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -72,6 +71,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
 
 public class Camera2BasicFragment extends Fragment
         implements ActivityCompat.OnRequestPermissionsResultCallback {
@@ -245,12 +250,67 @@ public class Camera2BasicFragment extends Fragment
 
         @Override
         public void onImageAvailable(ImageReader reader) {
+           imageTreatment(reader);
 
             //todo: remove this after testing
-            mBackgroundHandler.post(new Publisher(reader.acquireNextImage(), getActivity()));
+            // mBackgroundHandler.post(new Publisher(reader.acquireNextImage(), getActivity()));
         }
 
     };
+
+    private void imageTreatment(ImageReader reader)
+    {
+        Bitmap bitmap = convertImageReaderToBitmap(reader);
+        Crop(bitmap);
+        StringBuilder stringBuilder = RecognizeText(bitmap);
+    }
+
+    private Bitmap convertImageReaderToBitmap(ImageReader reader)
+    {
+        try {
+            Image image = reader.acquireLatestImage();
+
+            ByteBuffer buffer = image.getPlanes()[0].getBuffer();
+            byte[] bytes = new byte[buffer.remaining()];
+            buffer.get(bytes);
+
+            Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+            return bitmap;
+        }
+        catch (Exception e)
+        {
+            //Log
+            return null;
+        }
+    }
+
+    private void Crop(Bitmap bitmap) {
+    }
+
+    private StringBuilder RecognizeText(Bitmap bitmap) {
+        try {
+            Frame.Builder f = new Frame.Builder();
+            f.setBitmap(bitmap);
+
+            SparseArray<TextBlock> dataReco = textRecognizer.detect(f.build());
+
+            StringBuilder stringBuilder = new StringBuilder();
+            for(int i=0;i<dataReco.size();i++){
+                TextBlock item = dataReco.valueAt(i);
+                stringBuilder.append(item.getValue());
+                stringBuilder.append("\n");
+            }
+
+            return stringBuilder;
+        }
+        catch (Exception e)
+        {
+            //lOG
+        }
+
+        return null;
+
+    }
 
 
     /**
@@ -444,12 +504,15 @@ public class Camera2BasicFragment extends Fragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         return inflater.inflate(R.layout.fragment_camera2_basic, container, false);
     }
 
+    TextRecognizer textRecognizer ;
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
         mTextureView = (AutoFitTextureView) view.findViewById(R.id.texture);
+        textRecognizer = new TextRecognizer.Builder(getActivity().getApplicationContext()).build();
     }
 
     @Override

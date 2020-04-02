@@ -30,6 +30,7 @@
             android:name=".CameraActivity"
             android:screenOrientation="landscape"
             android:label="@string/app_name"></activity>
+        <meta-data android:name="com.google.android.gms.vision.DEPENDENCIES" android:value="ocr"/>
     </application>
 
 </manifest>
