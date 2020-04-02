@@ -50,6 +50,8 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.core.content.ContextCompat;
+
+import android.speech.tts.SynthesisCallback;
 import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
@@ -59,6 +61,8 @@ import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
+
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -73,12 +77,15 @@ import java.util.Objects;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
+import static com.example.android.camera2basic.App.staticLogger;
+
 public class Camera2BasicFragment extends Fragment
         implements ActivityCompat.OnRequestPermissionsResultCallback {
 
     /**
      * Conversion from screen rotation to JPEG orientation.
      */
+
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
     private static final int REQUEST_CAMERA_PERMISSION = 1;
     private static final String FRAGMENT_DIALOG = "dialog";
@@ -415,7 +422,7 @@ public class Camera2BasicFragment extends Fragment
         } else if (notBigEnough.size() > 0) {
             return Collections.max(notBigEnough, new CompareSizesByArea());
         } else {
-            Log.e(TAG, "Couldn't find any suitable preview size");
+            staticLogger.error("Couldn't find any suitable preview size");
             return choices[0];
         }
     }
@@ -523,10 +530,6 @@ public class Camera2BasicFragment extends Fragment
 //                            Arrays.asList(map.getOutputSizes(ImageFormat.JPEG)),
 //                            new CompareSizesByArea());
 //                }
-
-
-                Log.d(TAG, "resolution: " + largest);
-
 
                 mImageReader = ImageReader.newInstance(largest.getWidth(), largest.getHeight(),
                         ImageFormat.JPEG, /*maxImages*/2);
@@ -864,8 +867,6 @@ public class Camera2BasicFragment extends Fragment
                 public void onCaptureCompleted(@NonNull CameraCaptureSession session,
                                                @NonNull CaptureRequest request,
                                                @NonNull TotalCaptureResult result) {
-//                    showToast("Saved: " + mFile);
-                    Log.d(TAG, mFile.toString());
                     unlockFocus();
                 }
             };

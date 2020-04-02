@@ -20,8 +20,8 @@ import ch.qos.logback.core.spi.FilterReply;
 
 public class App extends Application {
 
+    static  org.slf4j.Logger staticLogger = LoggerFactory.getLogger("static-logger");
     private org.slf4j.Logger logger;
-
     public void onCreate () {
         // Setup handler for uncaught exceptions.
         super.onCreate();
@@ -39,7 +39,7 @@ public class App extends Application {
 
     public void handleUncaughtException (Thread thread, Throwable e)
     {
-        logger.error("--------------------------------------------------------------------------------------");
+
         logger.error("", e);
         Process.killProcess(Process.myPid());
     }
@@ -65,7 +65,7 @@ public class App extends Application {
 
         PatternLayoutEncoder exceptionsEncoder = new PatternLayoutEncoder();
         exceptionsEncoder.setContext(lc);
-        exceptionsEncoder.setPattern("%d{HH:mm:ss.SSS} - %name - %level - %thread - %xEx");
+        exceptionsEncoder.setPattern("%d{HH:mm:ss.SSS} - %logger - %level - %thread - %xEx");
         exceptionsEncoder.start();
 
         ThresholdFilter exceptionsFilter = new ThresholdFilter();

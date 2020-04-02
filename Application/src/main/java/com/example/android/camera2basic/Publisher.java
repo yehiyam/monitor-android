@@ -46,7 +46,6 @@ class Publisher implements Runnable {
 
     public void sendImageInPost(byte[] image, final String imageId, String timeStamp) {
         String requestUrl = String.format("%s/%s", ((CameraActivity) mActivity).serverUrl, UPLOAD_IMAGE_REST_FUNCTION);
-        Log.d(TAG, "sendImageInPost: " + requestUrl);
 
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
@@ -72,7 +71,6 @@ class Publisher implements Runnable {
         });
 
         final Request request = requestBuilder.build();
-        Log.e(TAG, "sendImageInPost: " + request);
         logger.info(request.toString());
 
 
@@ -81,12 +79,16 @@ class Publisher implements Runnable {
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                if (e instanceof java.net.SocketTimeoutException) {
+                    logger.info("timeout: " + call.request().header(IMAGE_ID_KEY));
+                } else {
+                    logger.error(e.toString());
+                }
                 e.printStackTrace();
                 mActivity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         Toast.makeText(mActivity, String.format("%s: did not get response", imageId) , Toast.LENGTH_SHORT).show();
-                        Log.d(TAG, String.format("%s: did not get response", imageId));
                     }
                 });
             }
@@ -96,7 +98,7 @@ class Publisher implements Runnable {
                 mActivity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Log.d(TAG, "run: " + response);
+                        logger.info(response.toString());
                         Toast.makeText(mActivity, String.format("%s: got return code: " + response.code(), imageId), Toast.LENGTH_LONG).show();
                     }
                 });
@@ -126,9 +128,7 @@ class Publisher implements Runnable {
 
     Publisher(Image image, Activity activity) {
         mImage = image;
-        //todo: yakir look on this
         mActivity = activity;
-        logger.info("create publisher");
     }
 
     @Override
