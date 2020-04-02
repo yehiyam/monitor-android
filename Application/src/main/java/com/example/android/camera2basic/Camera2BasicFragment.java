@@ -424,6 +424,24 @@ public class Camera2BasicFragment extends Fragment
         return new Camera2BasicFragment();
     }
 
+//    @Override
+//    public void onCreate(@Nullable Bundle savedInstanceState) {
+//        super.onCreate(savedInstanceState);
+//        SimpleOrientationListener mOrientationListener = new SimpleOrientationListener(
+//                getActivity()) {
+//
+//            @Override
+//            public void onSimpleOrientationChanged(int orientation) {
+//                if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+//
+//                } else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+//
+//                }
+//            }
+//        };
+//        mOrientationListener.enable();
+//    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -536,6 +554,7 @@ public class Camera2BasicFragment extends Fragment
                 // Find out if we need to swap dimension to get the preview size relative to sensor
                 // coordinate.
                 int displayRotation = activity.getWindowManager().getDefaultDisplay().getRotation();
+                Log.d(TAG, "setUpCameraOutputs: " + displayRotation);
                 //noinspection ConstantConditions
                 mSensorOrientation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
                 boolean swappedDimensions = false;
