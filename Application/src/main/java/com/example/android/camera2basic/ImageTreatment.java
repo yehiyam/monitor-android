@@ -41,9 +41,9 @@ public class ImageTreatment {
         return measurement;
     }
 
-    public HashMap<String, String> getAllMeasurement(ImageReader reader)
+    public HashMap<String, String> getAllMeasurement(byte[] bytes)
     {
-        Bitmap bitmap = convertImageReaderToBitmap(reader);
+        Bitmap bitmap = convertByteArrayToBitmap(bytes);
         File f = new File(mActivity.getExternalFilesDir(null), "test.jpg");
         bitmap =  BitmapFactory.decodeFile(f.getAbsolutePath());
 //        String dataReco = RecognizeText(bitmap);
@@ -56,15 +56,14 @@ public class ImageTreatment {
         return measurementHash;
     }
 
-    private Bitmap convertImageReaderToBitmap(ImageReader reader)
+    private Bitmap convertByteArrayToBitmap(byte[] bytes)
     {
+
+        if (bytes == null) {
+            return null;
+        }
+
         try {
-            Image image = reader.acquireLatestImage();
-
-            ByteBuffer buffer = image.getPlanes()[0].getBuffer();
-            byte[] bytes = new byte[buffer.remaining()];
-            buffer.get(bytes);
-
             Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
             return bitmap;
         }
@@ -74,6 +73,25 @@ public class ImageTreatment {
             return null;
         }
     }
+
+    public byte[] convertImageReaderToByteArray(ImageReader reader) {
+
+        if (reader == null) {
+            return null;
+        }
+
+        try {
+            Image image = reader.acquireLatestImage();
+
+            ByteBuffer buffer = image.getPlanes()[0].getBuffer();
+            byte[] bytes = new byte[buffer.remaining()];
+            buffer.get(bytes);
+            return bytes;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
 
 
     private Bitmap Crop(Bitmap bitmap, Rect rect) {

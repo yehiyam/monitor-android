@@ -39,19 +39,16 @@ import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.camera2.params.StreamConfigurationMap;
-import android.media.Image;
 import android.media.ImageReader;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.core.content.ContextCompat;
 
-import android.speech.tts.SynthesisCallback;
 import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
@@ -64,12 +61,10 @@ import android.widget.Toast;
 
 //import org.slf4j.LoggerFactory;
 
+import com.example.android.camera2basic.publishers.Publisher;
 import com.google.android.gms.vision.text.TextRecognizer;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -255,11 +250,12 @@ public class Camera2BasicFragment extends Fragment
 
         @Override
         public void onImageAvailable(ImageReader reader) {
+
             HashMap<String, String> measurements = imageTreatment.getAllMeasurement(reader);
             Log.d(TAG, "measurmenets " + measurements);
             //todo: remove this after testing
-//            mBackgroundHandler.post(new )
-//            mBackgroundHandler.post(new Publisher(reader.acquireNextImage(), getActivity()));
+//            mBackgroundHandler.post(new)
+            mBackgroundHandler.post(new Publisher(reader.acquireNextImage(), getActivity()));
         }
 
     };
