@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
     ViewGroup view;
 
     private String monitorId;
-
+    private String serverUrl;
 
 
     @Override
@@ -120,7 +120,8 @@ public class MainActivity extends AppCompatActivity {
         currentResolution = findViewById(R.id.resolution_string_tv);
 
         serverUrlEt = findViewById(R.id.server_url_et);
-        serverUrlEt.setText(R.string.default_server_url);
+        serverUrl = preference.getString(SERVER_URL_STRING, getString(R.string.default_server_url));
+        serverUrlEt.setText(serverUrl);
 
         monitorId = preference.getString(MONITOR_ID_KEY, null);
 
@@ -228,10 +229,15 @@ public class MainActivity extends AppCompatActivity {
         Intent cameraActivityIntent = new Intent(this, CameraActivity.class);
         cameraActivityIntent.putExtra(IMAGE_RESOLUTION_INDEX, resolutionViewModel.getResolutionIndex().getValue());
         cameraActivityIntent.putExtra(IMAGE_RESOLUTION_STRING, supportedResolution[resolutionViewModel.getResolutionIndex().getValue()].toString());
-        cameraActivityIntent.putExtra(SERVER_URL_STRING, serverUrlEt.getText().toString());
+
+        serverUrl = serverUrlEt.getText().toString();
+        cameraActivityIntent.putExtra(SERVER_URL_STRING, serverUrl);
+        preference.edit().putString(SERVER_URL_STRING, serverUrl).apply();
 
         int imageFrequency = Integer.parseInt(imageFrequencyEt.getText().toString());
         preference.edit().putInt(IMAGE_FREQUENCY_KEY, imageFrequency).apply();
+
+
         cameraActivityIntent.putExtra(IMAGE_FREQUENCY_KEY, imageFrequency);
         cameraActivityIntent.putExtra(MONITOR_ID_KEY, monitorId);
 
