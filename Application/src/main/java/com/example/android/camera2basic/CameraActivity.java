@@ -110,7 +110,12 @@ public class CameraActivity extends AppCompatActivity {
             @Override
             public void run() {
                 logger.info("taking picture");
-                camera2BasicFragment.takePicture();
+
+                try {
+                    camera2BasicFragment.takePicture();
+                } catch (java.lang.NullPointerException e) {
+                    logger.error("exception while taking picture", e);
+                }
 
                 //todo: remove after debug
                 Log.d(TAG, "imageFrequency:" + imageFrequencyMili);

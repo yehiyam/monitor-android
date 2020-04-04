@@ -85,16 +85,25 @@ class Publisher implements Runnable {
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 if (e instanceof java.net.SocketTimeoutException) {
                     logger.info("timeout: " + call.request().header(IMAGE_ID_KEY));
-                } else {
-                    logger.error(e.toString());
+                    mActivity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(mActivity, String.format("%s: did not get response", imageId) , Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                } else if (e instanceof java.net.ConnectException) {
+                    logger.info("connection error");
+                    mActivity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(mActivity, String.format("%s: could not connect to server", imageId) , Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+                else {
+                    logger.error("", e);
                 }
                 e.printStackTrace();
-                mActivity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(mActivity, String.format("%s: did not get response", imageId) , Toast.LENGTH_SHORT).show();
-                    }
-                });
             }
 
             @Override
