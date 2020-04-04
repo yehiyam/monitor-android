@@ -8,6 +8,7 @@ import com.example.android.camera2basic.CameraActivity;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.net.URI;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -31,7 +32,7 @@ public abstract class BasePublisher implements Runnable {
     BasePublisher(int imageId, String monitorId, String baseUrl) {
         this.imageId = imageId;
         this.monitorId = monitorId;
-        this.requestUrl = baseUrl + getSuffixUrl();
+        this.requestUrl = baseUrl + "/" + getSuffixUrl();
     }
 
     protected abstract String getSuffixUrl();

@@ -59,6 +59,7 @@ import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -254,12 +255,14 @@ public class Camera2BasicFragment extends Fragment
         public void onImageAvailable(ImageReader reader) {
             mBackgroundHandler.post(
                     new ImageManager(
-                            reader,
+                            reader.acquireNextImage(),
                             imageTreatment,
                             mBackgroundHandler,
                             ((CameraActivity) getActivity()).getImageId(),
                             ((CameraActivity) getActivity()).monitorId,
-                            ((CameraActivity) getActivity()).serverUrl));
+                            ((CameraActivity) getActivity()).serverUrl
+//                            ((CameraActivity) getActivity()).monitorIdTv
+                    ));
         }
     };
 

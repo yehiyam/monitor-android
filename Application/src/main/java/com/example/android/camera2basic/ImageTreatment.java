@@ -48,8 +48,8 @@ public class ImageTreatment {
         }
 
         Bitmap bitmap = convertByteArrayToBitmap(bytes);
-        File f = new File(mActivity.getExternalFilesDir(null), "test.jpg");
-        bitmap =  BitmapFactory.decodeFile(f.getAbsolutePath());
+//        File f = new File(mActivity.getExternalFilesDir(null), "test.jpg");
+//        bitmap =  BitmapFactory.decodeFile(f.getAbsolutePath());
 //        String dataReco = RecognizeText(bitmap);
 //        RecognizeText(bitmap);
         HashMap<String, String> measurementHash = new HashMap<>();
@@ -99,6 +99,7 @@ public class ImageTreatment {
 
 
     private Bitmap Crop(Bitmap bitmap, Rect rect) {
+
 //        try {
             bitmap = Bitmap.createBitmap(bitmap, rect.left, rect.top, rect.width(), rect.height());
 //        } catch (IllegalArgumentException e) {
