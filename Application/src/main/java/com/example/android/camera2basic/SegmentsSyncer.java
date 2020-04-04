@@ -2,6 +2,7 @@ package com.example.android.camera2basic;
 
 
 import android.graphics.Rect;
+import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -36,12 +37,18 @@ public class SegmentsSyncer implements Runnable, SegmentsInterface {
 
     private void getMonitorData () {
 
+        if (monitorId == null) {
+            return;
+        }
+
+
         OkHttpClient client = new OkHttpClient();
         String url = String.format("%s/%s/%s",
                 serverUrl, GET_MONITOR_DATA_REST, monitorId);
         final Request request = new Request.Builder()
                 .url(url)
                 .build();
+        Log.d("network", "request" + request);
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
@@ -61,7 +68,10 @@ public class SegmentsSyncer implements Runnable, SegmentsInterface {
                         .serializeNulls()
                         .registerTypeAdapter(HashMap.class, new GsonSerializations.CroppingHashMapDeSerializer())
                         .create();
-                segments = gson.fromJson( json, new TypeToken<HashMap<String, Rect>>(){}.getType());
+                Log.d("network", "response:" + json);
+//                try {
+                    segments = gson.fromJson( json, new TypeToken<HashMap<String, Rect>>(){}.getType());
+//                } catch ()
             }
         });
     }
@@ -71,7 +81,7 @@ public class SegmentsSyncer implements Runnable, SegmentsInterface {
         while (true) {
             try {
                 getMonitorData();
-                Thread.sleep(3000);
+                Thread.sleep(30000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             } catch (Exception e) {

@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
     public static final String SERVER_URL_STRING = "SERVER_URL_STRING";
     public static final String IMAGE_FREQUENCY_KEY = "IMAGE_FREQUENCY";
     public static final String MONITOR_ID_KEY = "MONITOR_ID";
-    public static final String GET_MONITOR_DATA_REST = "MONITOR_ID";
+    public static final String GET_MONITOR_DATA_REST = "monitor";
 
     public static final int WRONG_QR_RESULT_CODE = 2;
 
@@ -89,7 +89,6 @@ public class MainActivity extends AppCompatActivity {
     HashMap<String, Rect> croppingMap;
 
     private String monitorId;
-    private NetworkManager networkManager;
     SegmentsSyncer segmentsSyncer;
 
 
@@ -117,26 +116,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-//        networkManager = new NetworkManager();
-//        networkManager.getMonitorData(getString(R.string.default_server_url), "cvmonitors-respirator-295f4b34d7894ab9", new Callback() {
-//            @Override
-//            public void onFailure(@NotNull Call call, @NotNull IOException e) {
-//
-//            }
-//
-//            @Override
-//            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-//                String stringJson = response.body().string();
-//                Log.d("TAG", "onResponse: " + stringJson);
-//                Gson gson = new GsonBuilder()
-//                        .serializeNulls()
-//                        .registerTypeAdapter(HashMap.class, new GsonSerializations.CroppingHashMapDeSerializer())
-//                        .create();
-//                HashMap<String, Rect> croppingMap= gson.fromJson(stringJson, new TypeToken<HashMap<String, Rect>>(){}.getType());
-//            }
-//        });
-
-
         preference = PreferenceManager.getDefaultSharedPreferences(this);
 
         supportedResolution = getSupportedResolutions();
@@ -149,11 +128,12 @@ public class MainActivity extends AppCompatActivity {
         serverUrlEt = findViewById(R.id.server_url_et);
         serverUrlEt.setText(R.string.default_server_url);
 
-        segmentsSyncer = new SegmentsSyncer(getString(R.string.default_server_url), monitorId);
-        AsyncTask.execute(segmentsSyncer);
-
 
         monitorId = preference.getString(MONITOR_ID_KEY, null);
+
+        if (monitorId != null) {
+            startSegmentsSyncer();
+        }
 
         imageFrequencyEt = findViewById(R.id.image_frequncy_et);
 
@@ -282,12 +262,19 @@ public class MainActivity extends AppCompatActivity {
         return null;
     }
 
+    //todo: turn off the first asynctask
+    private void startSegmentsSyncer() {
+        segmentsSyncer = new SegmentsSyncer(getString(R.string.default_server_url), monitorId);
+        AsyncTask.execute(segmentsSyncer);
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK && data != null) {
             monitorId = data.getStringExtra(MONITOR_ID_KEY);
             preference.edit().putString(MONITOR_ID_KEY, monitorId).apply();
+            startSegmentsSyncer();
         }
     }
 }

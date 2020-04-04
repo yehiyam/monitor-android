@@ -74,7 +74,6 @@ public class CameraActivity extends AppCompatActivity {
 
     public String serverUrl;
     public String monitorId;
-    private NetworkManager networkManager;
 
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -82,8 +81,6 @@ public class CameraActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
-
-        networkManager = new NetworkManager();
 
 //        croppingMap = new HashMap<>();
 //        croppingMap.put("up", new Rect(50, 50,400,400));
@@ -97,25 +94,6 @@ public class CameraActivity extends AppCompatActivity {
         monitorId = getIntent().getStringExtra(MainActivity.MONITOR_ID_KEY);
 
         serverUrl = getIntent().getStringExtra(MainActivity.SERVER_URL_STRING);
-
-        networkManager.getMonitorData(serverUrl, monitorId, new Callback() {
-            @Override
-            public void onFailure(@NotNull Call call, @NotNull IOException e) {
-
-            }
-
-            @Override
-            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                String stringJson = response.body().string();
-                Log.d("TAG", "onResponse: " + stringJson);
-                Gson gson = new GsonBuilder()
-                        .serializeNulls()
-                        .registerTypeAdapter(HashMap.class, new GsonSerializations.CroppingHashMapDeSerializer())
-                        .create();
-                croppingMap = gson.fromJson(stringJson, new TypeToken<HashMap<String, Rect>>(){}.getType());
-                Log.d(TAG, "onResponse: ");
-            }
-        });
 
         TextView resolutionStringTv = findViewById(R.id.resolution_string_tv);
         resolutionStringTv.setText(resolutionString);
@@ -140,7 +118,6 @@ public class CameraActivity extends AppCompatActivity {
                     .commit();
         }
 
-//        supportedResolution = camera2BasicFragment.getSupportedResolutions();
 
         handler = new Handler();
         takingPicturesRunnable = new Runnable() {
@@ -161,8 +138,7 @@ public class CameraActivity extends AppCompatActivity {
         stopTakingPicturesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                camera2BasicFragment.takePicture();
-//                stopTakingPicturesDialog();
+                stopTakingPicturesDialog();
             }
         });
     }
@@ -174,11 +150,11 @@ public class CameraActivity extends AppCompatActivity {
     }
 
     public void startTakingPictures() {
-//        camera2BasicFragment.takePicture();
-//        if (!handler.hasCallbacks(takingPicturesRunnable)) {
-//            Log.i(TAG, "startTakingPictures");
-//            handler.postDelayed(takingPicturesRunnable, DELAY_BEFORE_TAKING_PICTURES_MILLIS);
-//        }
+        camera2BasicFragment.takePicture();
+        if (!handler.hasCallbacks(takingPicturesRunnable)) {
+            Log.i(TAG, "startTakingPictures");
+            handler.postDelayed(takingPicturesRunnable, DELAY_BEFORE_TAKING_PICTURES_MILLIS);
+        }
     }
 
     public void stopTakingPictures() {

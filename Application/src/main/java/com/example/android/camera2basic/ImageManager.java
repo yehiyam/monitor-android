@@ -38,7 +38,7 @@ public class ImageManager implements Runnable {
         if (measurements != null) {
             backgroundHandler.post(new OcrPublisher(measurements, imageId, monitorId, baseUrl));
         }
-//        Log.d("measurments", );
+        Log.d("measurments", "measurments" + measurements);
 
 
         backgroundHandler.post(new ImagePublisher(bytes, imageId, monitorId, baseUrl));

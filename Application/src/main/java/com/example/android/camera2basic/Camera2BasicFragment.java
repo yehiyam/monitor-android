@@ -63,7 +63,6 @@ import android.widget.Toast;
 
 //import org.slf4j.LoggerFactory;
 
-import com.example.android.camera2basic.publishers.Publisher;
 import com.google.android.gms.vision.text.TextRecognizer;
 
 import java.io.File;
@@ -252,14 +251,14 @@ public class Camera2BasicFragment extends Fragment
 
         @Override
         public void onImageAvailable(ImageReader reader) {
-            mBackgroundHandler.post(new ImageManager((
-                    reader,
-                    imageTreatment,
-                    mBackgroundHandler,
-                    ((CameraActivity) getActivity()).getImageId(),
-                    ((CameraActivity) getActivity()).monitorId,
-                    ((CameraActivity)getActivity()).serverUrl)
-            );
+            mBackgroundHandler.post(
+                    new ImageManager(
+                            reader,
+                            imageTreatment,
+                            mBackgroundHandler,
+                            ((CameraActivity) getActivity()).getImageId(),
+                            ((CameraActivity) getActivity()).monitorId,
+                            ((CameraActivity) getActivity()).serverUrl));
         }
     };
 
