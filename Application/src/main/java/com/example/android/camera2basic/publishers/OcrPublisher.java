@@ -2,6 +2,8 @@ package com.example.android.camera2basic.publishers;
 
 import android.util.Log;
 
+import com.google.gson.Gson;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -18,10 +20,11 @@ import okhttp3.Response;
 public class OcrPublisher extends BasePublisher{
 
     private final static String SUFFIX_URL = "monitor_data";
+    private final static Gson gson = new Gson();
 
     private final HashMap<String, String> measurements;
 
-    OcrPublisher(HashMap<String, String> measurements, int imageId, String monitorId, String baseUrl) {
+    public OcrPublisher(HashMap<String, String> measurements, int imageId, String monitorId, String baseUrl) {
         super(imageId, monitorId, baseUrl);
         this.measurements = measurements;
     }
@@ -49,7 +52,6 @@ public class OcrPublisher extends BasePublisher{
     @Override
     protected RequestBody BuildRequestBody() {
         MediaType mediaType = MediaType.parse("application/json");
-        return RequestBody.create(measurements.toString(), mediaType);
+        return RequestBody.create(gson.toJson(measurements), mediaType);
     }
-
 }

@@ -22,6 +22,7 @@ import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.params.StreamConfigurationMap;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.AttributeSet;
@@ -89,6 +90,8 @@ public class MainActivity extends AppCompatActivity {
 
     private String monitorId;
     private NetworkManager networkManager;
+    SegmentsSyncer segmentsSyncer;
+
 
 
     @Override
@@ -105,7 +108,6 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-
         ImageButton startTakingPicturesButton = findViewById(R.id.start_taking_pictures_button);
         startTakingPicturesButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -115,24 +117,24 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-        networkManager = new NetworkManager();
-        networkManager.getMonitorData(getString(R.string.default_server_url), "cvmonitors-respirator-295f4b34d7894ab9", new Callback() {
-            @Override
-            public void onFailure(@NotNull Call call, @NotNull IOException e) {
-
-            }
-
-            @Override
-            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                String stringJson = response.body().string();
-                Log.d("TAG", "onResponse: " + stringJson);
-                Gson gson = new GsonBuilder()
-                        .serializeNulls()
-                        .registerTypeAdapter(HashMap.class, new GsonSerializations.CroppingHashMapDeSerializer())
-                        .create();
-                HashMap<String, Rect> croppingMap= gson.fromJson(stringJson, new TypeToken<HashMap<String, Rect>>(){}.getType());
-            }
-        });
+//        networkManager = new NetworkManager();
+//        networkManager.getMonitorData(getString(R.string.default_server_url), "cvmonitors-respirator-295f4b34d7894ab9", new Callback() {
+//            @Override
+//            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+//
+//            }
+//
+//            @Override
+//            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+//                String stringJson = response.body().string();
+//                Log.d("TAG", "onResponse: " + stringJson);
+//                Gson gson = new GsonBuilder()
+//                        .serializeNulls()
+//                        .registerTypeAdapter(HashMap.class, new GsonSerializations.CroppingHashMapDeSerializer())
+//                        .create();
+//                HashMap<String, Rect> croppingMap= gson.fromJson(stringJson, new TypeToken<HashMap<String, Rect>>(){}.getType());
+//            }
+//        });
 
 
         preference = PreferenceManager.getDefaultSharedPreferences(this);
@@ -146,6 +148,10 @@ public class MainActivity extends AppCompatActivity {
 
         serverUrlEt = findViewById(R.id.server_url_et);
         serverUrlEt.setText(R.string.default_server_url);
+
+        segmentsSyncer = new SegmentsSyncer(getString(R.string.default_server_url), monitorId);
+        AsyncTask.execute(segmentsSyncer);
+
 
         monitorId = preference.getString(MONITOR_ID_KEY, null);
 

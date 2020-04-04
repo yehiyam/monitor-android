@@ -24,6 +24,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.graphics.Camera;
 import android.graphics.ImageFormat;
 import android.graphics.Matrix;
 import android.graphics.Point;
@@ -39,6 +40,7 @@ import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.camera2.params.StreamConfigurationMap;
+import android.media.Image;
 import android.media.ImageReader;
 import android.os.Bundle;
 import android.os.Handler;
@@ -250,14 +252,15 @@ public class Camera2BasicFragment extends Fragment
 
         @Override
         public void onImageAvailable(ImageReader reader) {
-
-            HashMap<String, String> measurements = imageTreatment.getAllMeasurement(reader);
-            Log.d(TAG, "measurmenets " + measurements);
-            //todo: remove this after testing
-//            mBackgroundHandler.post(new)
-            mBackgroundHandler.post(new Publisher(reader.acquireNextImage(), getActivity()));
+            mBackgroundHandler.post(new ImageManager((
+                    reader,
+                    imageTreatment,
+                    mBackgroundHandler,
+                    ((CameraActivity) getActivity()).getImageId(),
+                    ((CameraActivity) getActivity()).monitorId,
+                    ((CameraActivity)getActivity()).serverUrl)
+            );
         }
-
     };
 
 
@@ -360,6 +363,7 @@ public class Camera2BasicFragment extends Fragment
         }
 
     };
+
     private ImageTreatment imageTreatment;
     private TextRecognizer textRecognizer;
 
@@ -444,7 +448,7 @@ public class Camera2BasicFragment extends Fragment
     public void onViewCreated(final View view, Bundle savedInstanceState) {
         mTextureView = (AutoFitTextureView) view.findViewById(R.id.texture);
         textRecognizer = new TextRecognizer.Builder(getActivity().getApplicationContext()).build();
-        imageTreatment = new ImageTreatment(((CameraActivity)getActivity()).croppingMap, textRecognizer, getActivity());
+        imageTreatment = new ImageTreatment(SegmentsSyncer.getSegments(), textRecognizer, getActivity());
     }
 
     @Override

@@ -43,6 +43,10 @@ public class ImageTreatment {
 
     public HashMap<String, String> getAllMeasurement(byte[] bytes)
     {
+        if (croppingMap == null) {
+            return null;
+        }
+
         Bitmap bitmap = convertByteArrayToBitmap(bytes);
         File f = new File(mActivity.getExternalFilesDir(null), "test.jpg");
         bitmap =  BitmapFactory.decodeFile(f.getAbsolutePath());

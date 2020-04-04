@@ -23,7 +23,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 
-class ImagePublisher extends BasePublisher {
+public class ImagePublisher extends BasePublisher {
 
     /**
      * The JPEG image
@@ -59,7 +59,7 @@ class ImagePublisher extends BasePublisher {
 //        }
 //    }
 
-    ImagePublisher(byte[] image, int imageId, String monitorId, String BaseUrl) {
+    public ImagePublisher(byte[] image, int imageId, String monitorId, String BaseUrl) {
         super(imageId, monitorId, BaseUrl);
         this.image = image;
     }
