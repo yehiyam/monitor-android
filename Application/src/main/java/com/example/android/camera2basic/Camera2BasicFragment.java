@@ -24,6 +24,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.graphics.Camera;
 import android.graphics.ImageFormat;
 import android.graphics.Matrix;
 import android.graphics.Point;
@@ -45,13 +46,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.core.content.ContextCompat;
 
-import android.speech.tts.SynthesisCallback;
 import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
@@ -62,16 +61,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+
+import com.google.android.gms.vision.text.TextRecognizer;
+
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Semaphore;
@@ -252,11 +252,15 @@ public class Camera2BasicFragment extends Fragment
 
         @Override
         public void onImageAvailable(ImageReader reader) {
-
-            //todo: remove this after testing
-            mBackgroundHandler.post(new Publisher(reader.acquireNextImage(), getActivity()));
+            mBackgroundHandler.post(
+                    new ImageManager(
+                            reader,
+                            imageTreatment,
+                            mBackgroundHandler,
+                            ((CameraActivity) getActivity()).getImageId(),
+                            ((CameraActivity) getActivity()).monitorId,
+                            ((CameraActivity) getActivity()).serverUrl));
         }
-
     };
 
 
@@ -360,6 +364,9 @@ public class Camera2BasicFragment extends Fragment
 
     };
 
+    private ImageTreatment imageTreatment;
+    private TextRecognizer textRecognizer;
+
     /**
      * Shows a {@link Toast} on the UI thread.
      *
@@ -430,33 +437,18 @@ public class Camera2BasicFragment extends Fragment
         return new Camera2BasicFragment();
     }
 
-//    @Override
-//    public void onCreate(@Nullable Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        SimpleOrientationListener mOrientationListener = new SimpleOrientationListener(
-//                getActivity()) {
-//
-//            @Override
-//            public void onSimpleOrientationChanged(int orientation) {
-//                if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-//
-//                } else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-//
-//                }
-//            }
-//        };
-//        mOrientationListener.enable();
-//    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_camera2_basic, container, false);
-    }
+        View view = inflater.inflate(R.layout.fragment_camera2_basic, container, false);
+        return view;
+        }
 
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
         mTextureView = (AutoFitTextureView) view.findViewById(R.id.texture);
+        textRecognizer = new TextRecognizer.Builder(getActivity().getApplicationContext()).build();
+        imageTreatment = new ImageTreatment(SegmentsSyncer.getSegments(), textRecognizer, getActivity());
     }
 
     @Override
@@ -556,7 +548,6 @@ public class Camera2BasicFragment extends Fragment
                 // Find out if we need to swap dimension to get the preview size relative to sensor
                 // coordinate.
                 int displayRotation = activity.getWindowManager().getDefaultDisplay().getRotation();
-                Log.d(TAG, "setUpCameraOutputs: " + displayRotation);
                 //noinspection ConstantConditions
                 mSensorOrientation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
                 boolean swappedDimensions = false;

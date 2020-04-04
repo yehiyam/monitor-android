@@ -18,6 +18,7 @@ package com.example.android.camera2basic;
 
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -30,6 +31,19 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+
+import org.jetbrains.annotations.NotNull;
+
+import java.io.IOException;
+import java.util.HashMap;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
 
 import org.slf4j.LoggerFactory;
 
@@ -60,6 +74,8 @@ public class CameraActivity extends AppCompatActivity {
 
     int resolutionIndex;
 
+    public HashMap<String, Rect> croppingMap;
+
     public String serverUrl;
     public String monitorId;
 
@@ -71,7 +87,7 @@ public class CameraActivity extends AppCompatActivity {
         setContentView(R.layout.activity_camera);
 
 
-        // load image frequency from shared preference
+                // load image frequency from shared preference
         preference = PreferenceManager.getDefaultSharedPreferences(this);
         imageFrequencyMili = getIntent().getIntExtra(MainActivity.IMAGE_FREQUENCY_KEY, 3000);
         resolutionIndex = getIntent().getIntExtra(MainActivity.IMAGE_RESOLUTION_INDEX,  0);
@@ -103,7 +119,6 @@ public class CameraActivity extends AppCompatActivity {
                     .commit();
         }
 
-//        supportedResolution = camera2BasicFragment.getSupportedResolutions();
 
         handler = new Handler();
         takingPicturesRunnable = new Runnable() {

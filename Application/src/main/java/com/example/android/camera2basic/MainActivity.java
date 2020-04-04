@@ -6,6 +6,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.preference.PreferenceManager;
@@ -17,14 +18,17 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.ImageFormat;
+import android.graphics.Rect;
 import android.graphics.Path;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.params.StreamConfigurationMap;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.Size;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,8 +39,15 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import com.google.zxing.Result;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.io.IOException;
+import java.util.HashMap;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
@@ -50,6 +61,9 @@ import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.FileAppender;
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -58,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
     public static final String SERVER_URL_STRING = "SERVER_URL_STRING";
     public static final String IMAGE_FREQUENCY_KEY = "IMAGE_FREQUENCY";
     public static final String MONITOR_ID_KEY = "MONITOR_ID";
+    public static final String GET_MONITOR_DATA_REST = "monitor";
 
     public static final int WRONG_QR_RESULT_CODE = 2;
 
@@ -83,8 +98,12 @@ public class MainActivity extends AppCompatActivity {
     private String image_resolution_index;
     ViewGroup view;
 
+    HashMap<String, Rect> croppingMap;
+
     private String monitorId;
     private String serverUrl;
+    SegmentsSyncer segmentsSyncer;
+
 
 
     @Override
@@ -101,7 +120,6 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-
         ImageButton startTakingPicturesButton = findViewById(R.id.start_taking_pictures_button);
         startTakingPicturesButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -109,6 +127,7 @@ public class MainActivity extends AppCompatActivity {
                 startCameraActivity();
             }
         });
+
 
         preference = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -123,7 +142,12 @@ public class MainActivity extends AppCompatActivity {
         serverUrl = preference.getString(SERVER_URL_STRING, getString(R.string.default_server_url));
         serverUrlEt.setText(serverUrl);
 
+
         monitorId = preference.getString(MONITOR_ID_KEY, null);
+
+        if (monitorId != null) {
+            startSegmentsSyncer();
+        }
 
         imageFrequencyEt = findViewById(R.id.image_frequncy_et);
 
@@ -169,8 +193,6 @@ public class MainActivity extends AppCompatActivity {
                 scanQr();
             }
         });
-
-        startCameraActivity();
 
     }
 
@@ -260,6 +282,12 @@ public class MainActivity extends AppCompatActivity {
         return null;
     }
 
+    //todo: turn off the first asynctask
+    private void startSegmentsSyncer() {
+        segmentsSyncer = new SegmentsSyncer(getString(R.string.default_server_url), monitorId);
+        AsyncTask.execute(segmentsSyncer);
+    }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -267,6 +295,7 @@ public class MainActivity extends AppCompatActivity {
         if (resultCode == Activity.RESULT_OK && data != null) {
             monitorId = data.getStringExtra(MONITOR_ID_KEY);
             preference.edit().putString(MONITOR_ID_KEY, monitorId).apply();
+            startSegmentsSyncer();
         }
     }
 }
