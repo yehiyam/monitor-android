@@ -6,10 +6,17 @@ import java.util.ArrayList;
 
 public class MonitorData {
 
-    private String imageId;
+    private int imageId;
     private String monitorId;
     private long timestamp;
 
     private ArrayList<Segments> segments;
+
+    public MonitorData(ArrayList<Segments> segments, int imageId, String monitorId, long timestamp) {
+        this.segments = segments;
+        this.imageId = imageId;
+        this.monitorId = monitorId;
+        this.timestamp = timestamp;
+    }
 
 }

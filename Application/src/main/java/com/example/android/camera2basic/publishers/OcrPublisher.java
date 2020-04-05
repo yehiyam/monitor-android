@@ -2,12 +2,14 @@ package com.example.android.camera2basic.publishers;
 
 import android.util.Log;
 
+import com.example.android.camera2basic.Segments;
 import com.example.android.camera2basic.SegmentsSyncer;
 import com.google.gson.Gson;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import okhttp3.Call;
@@ -23,16 +25,21 @@ public class OcrPublisher extends BasePublisher{
     private final static String SUFFIX_URL = "monitor";
     private final static Gson gson = new Gson();
 
-    private final HashMap<String, String> measurements;
+    private final MonitorData monitorData;
 
-    public OcrPublisher(HashMap<String, String> measurements, int imageId, String monitorId, String baseUrl) {
-        super(imageId, monitorId, baseUrl);
-        this.measurements = measurements;
+    public OcrPublisher(MonitorData monitorData, String baseUrl) {
+        super(baseUrl);
+        this.monitorData = monitorData;
     }
     
     @Override
     protected String getSuffixUrl() {
         return SUFFIX_URL;
+    }
+
+    @Override
+    protected void setHeaders(Request.Builder builder) {
+
     }
 
     @Override
@@ -54,6 +61,6 @@ public class OcrPublisher extends BasePublisher{
     protected RequestBody BuildRequestBody() {
         MediaType mediaType = MediaType.parse("application/json");
 //        SegmentsSyncer.getSegments().put()
-        return RequestBody.create(gson.toJson(measurements), mediaType);
+        return RequestBody.create(gson.toJson(monitorData), mediaType);
     }
 }

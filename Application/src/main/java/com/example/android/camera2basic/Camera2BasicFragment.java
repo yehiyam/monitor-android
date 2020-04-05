@@ -59,6 +59,7 @@ import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageSwitcher;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -260,7 +261,8 @@ public class Camera2BasicFragment extends Fragment
                             mBackgroundHandler,
                             ((CameraActivity) getActivity()).getImageId(),
                             ((CameraActivity) getActivity()).monitorId,
-                            ((CameraActivity) getActivity()).serverUrl
+                            ((CameraActivity) getActivity()).serverUrl,
+                            SegmentsSyncer.getSegments()
 //                            ((CameraActivity) getActivity()).monitorIdTv
                     ));
         }
@@ -451,7 +453,7 @@ public class Camera2BasicFragment extends Fragment
     public void onViewCreated(final View view, Bundle savedInstanceState) {
         mTextureView = (AutoFitTextureView) view.findViewById(R.id.texture);
         textRecognizer = new TextRecognizer.Builder(getActivity().getApplicationContext()).build();
-        imageTreatment = new ImageTreatment(SegmentsSyncer.getSegments(), textRecognizer, getActivity());
+        imageTreatment = new ImageTreatment(textRecognizer, getActivity());
     }
 
     @Override

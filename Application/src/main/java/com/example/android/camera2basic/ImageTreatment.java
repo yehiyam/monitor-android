@@ -23,14 +23,12 @@ import java.util.Map;
 
 public class ImageTreatment {
 
-    private final HashMap<String, Rect> croppingMap;
     private final TextRecognizer textRecognizer;
     private final Activity mActivity;
     Bitmap bitmap;
 
-    ImageTreatment(HashMap<String, Rect> croppingMap, TextRecognizer textRecognizer, Activity activity)
+    ImageTreatment(TextRecognizer textRecognizer, Activity activity)
     {
-        this.croppingMap = croppingMap;
         this.textRecognizer = textRecognizer;
         mActivity = activity;
     }
@@ -58,7 +56,7 @@ public class ImageTreatment {
         return segment;
     }
 
-    public ArrayList<Segments> getAllMeasurement(byte[] bytes)
+    public ArrayList<Segments> getAllMeasurement(byte[] bytes, HashMap<String, Rect> croppingMap)
     {
         if (croppingMap == null) {
             return null;

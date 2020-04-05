@@ -59,7 +59,7 @@ public class ImagePublisher extends BasePublisher {
 //        }
 //    }
 
-    public ImagePublisher(byte[] image, int imageId, String monitorId, String BaseUrl) {
+    public ImagePublisher(byte[] image, int imageId, String monitorId, long timestamp, String BaseUrl) {
         super(imageId, monitorId, BaseUrl);
         this.image = image;
     }
@@ -67,6 +67,18 @@ public class ImagePublisher extends BasePublisher {
     @Override
     protected String getSuffixUrl() {
         return SUFFIX_URL;
+    }
+
+    @Override
+    protected void setHeaders(Request.Builder builder) {
+        String imageIdString = String.valueOf(imageId);
+        builder.addHeader(IMAGE_ID_KEY, imageIdString);
+
+        builder.addHeader(TIME_STAMP_KEY, String.valueOf(timeStamp));
+
+        if (monitorId != null) {
+            builder.addHeader(MONITOR_ID_KEY, monitorId);
+        }
     }
 
     @Override
