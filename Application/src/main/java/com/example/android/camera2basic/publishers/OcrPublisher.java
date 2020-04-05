@@ -2,6 +2,7 @@ package com.example.android.camera2basic.publishers;
 
 import android.util.Log;
 
+import com.example.android.camera2basic.SegmentsSyncer;
 import com.google.gson.Gson;
 
 import org.jetbrains.annotations.NotNull;
@@ -19,7 +20,7 @@ import okhttp3.Response;
 
 public class OcrPublisher extends BasePublisher{
 
-    private final static String SUFFIX_URL = "monitor_data";
+    private final static String SUFFIX_URL = "monitor";
     private final static Gson gson = new Gson();
 
     private final HashMap<String, String> measurements;
@@ -52,6 +53,7 @@ public class OcrPublisher extends BasePublisher{
     @Override
     protected RequestBody BuildRequestBody() {
         MediaType mediaType = MediaType.parse("application/json");
+//        SegmentsSyncer.getSegments().put()
         return RequestBody.create(gson.toJson(measurements), mediaType);
     }
 }

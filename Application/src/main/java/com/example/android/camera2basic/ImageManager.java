@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.util.Log;
 
 import com.example.android.camera2basic.publishers.ImagePublisher;
+import com.example.android.camera2basic.publishers.MonitorData;
 import com.example.android.camera2basic.publishers.OcrPublisher;
 
 import java.util.HashMap;
@@ -38,6 +39,8 @@ public class ImageManager implements Runnable {
         byte[] bytes = imageTreatment.convertImageToByteArray(image);
         image.close();
 
+        MonitorData monitorData = new MonitorData();
+
         if (bytes == null) {
             staticLogger.info("did not take picture");
             return;
@@ -48,7 +51,7 @@ public class ImageManager implements Runnable {
             backgroundHandler.post(new OcrPublisher(measurements, imageId, monitorId, baseUrl));
         }
         Log.d("measurments", "measurments" + measurements);
-        staticLogger.info("ocr: " + measurements);
+
 
         backgroundHandler.post(new ImagePublisher(bytes, imageId, monitorId, baseUrl));
     }
