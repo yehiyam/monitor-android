@@ -1,11 +1,8 @@
 package com.example.android.camera2basic;
 
-import android.app.Activity;
-import android.media.ImageReader;
+import android.media.Image;
 import android.os.Handler;
 import android.util.Log;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.android.camera2basic.publishers.ImagePublisher;
 import com.example.android.camera2basic.publishers.OcrPublisher;
@@ -21,12 +18,12 @@ public class ImageManager implements Runnable {
     private final String monitorId;
     private final String baseUrl;
 //    private final CameraActivity activity;
-    private ImageReader reader;
+    private Image image;
     private ImageTreatment imageTreatment;
 
-    ImageManager(ImageReader reader, ImageTreatment imageTreatment, android.os.Handler backgroundHandler,
+    ImageManager(Image image, ImageTreatment imageTreatment, android.os.Handler backgroundHandler,
                  int imageId, String monitorId, String baseUrl) {
-        this.reader = reader;
+        this.image = image;
         this.imageTreatment = imageTreatment;
         this.backgroundHandler = backgroundHandler;
         this.imageId = imageId;
@@ -38,7 +35,8 @@ public class ImageManager implements Runnable {
 
     @Override
     public void run() {
-        byte[] bytes = imageTreatment.convertImageReaderToByteArray(reader);
+        byte[] bytes = imageTreatment.convertImageToByteArray(image);
+        image.close();
 
         if (bytes == null) {
             staticLogger.info("did not take picture");
@@ -51,7 +49,6 @@ public class ImageManager implements Runnable {
         }
         Log.d("measurments", "measurments" + measurements);
         staticLogger.info("ocr: " + measurements);
-
 
         backgroundHandler.post(new ImagePublisher(bytes, imageId, monitorId, baseUrl));
     }

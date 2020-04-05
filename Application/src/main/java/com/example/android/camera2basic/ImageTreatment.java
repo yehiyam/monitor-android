@@ -78,15 +78,13 @@ public class ImageTreatment {
         }
     }
 
-    public byte[] convertImageReaderToByteArray(ImageReader reader) {
+    public byte[] convertImageToByteArray(Image image) {
 
-        if (reader == null) {
+        if (image == null) {
             return null;
         }
 
         try {
-            Image image = reader.acquireLatestImage();
-
             ByteBuffer buffer = image.getPlanes()[0].getBuffer();
             byte[] bytes = new byte[buffer.remaining()];
             buffer.get(bytes);
@@ -101,6 +99,7 @@ public class ImageTreatment {
     private Bitmap Crop(Bitmap bitmap, Rect rect) {
 
 //        try {
+        Log.d("", "Crop: " + rect);
             bitmap = Bitmap.createBitmap(bitmap, rect.left, rect.top, rect.width(), rect.height());
 //        } catch (IllegalArgumentException e) {
 //
@@ -142,7 +141,7 @@ public class ImageTreatment {
 
     public void saveImage(Bitmap bmp) {
         FileOutputStream output = null;
-        File filename = new File(mActivity.getExternalFilesDir(null), System.currentTimeMillis() + ".jpg");
+        File filename = new File(mActivity.getExternalFilesDir("crop"), System.currentTimeMillis() + ".jpg");
         try (FileOutputStream out = new FileOutputStream(filename)) {
             bmp.compress(Bitmap.CompressFormat.PNG, 1, out); // bmp is your Bitmap instance
             // PNG is a lossless format, the compression factor (100) is ignored
