@@ -8,6 +8,7 @@ import com.example.android.camera2basic.publishers.ImagePublisher;
 import com.example.android.camera2basic.publishers.MonitorData;
 import com.example.android.camera2basic.publishers.OcrPublisher;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import static com.example.android.camera2basic.App.staticLogger;
@@ -46,11 +47,18 @@ public class ImageManager implements Runnable {
             return;
         }
 
-        HashMap<String, String> measurements = imageTreatment.getAllMeasurement(bytes);
-        if (measurements != null) {
-            backgroundHandler.post(new OcrPublisher(measurements, imageId, monitorId, baseUrl));
+        if (imageTreatment.isOperational()) {
+            ArrayList<Segments> segments = imageTreatment.getAllMeasurement(bytes);
+            if (segments != null) {
+                backgroundHandler.post(new OcrPublisher(segments, imageId, monitorId, baseUrl));
+            }
+            staticLogger.info("segments" + segments);
+            Log.d("measurments", "measurments" + segments)
+        } else {
+            staticLogger.info("ocr is not supported");
         }
-        Log.d("measurments", "measurments" + measurements);
+
+
 
 
         backgroundHandler.post(new ImagePublisher(bytes, imageId, monitorId, baseUrl));

@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,14 +35,30 @@ public class ImageTreatment {
         mActivity = activity;
     }
 
-    public String getMeasurement(Bitmap bitmap, Rect rect) {
+    public boolean isOperational() {
+        if (textRecognizer == null) {
+            return false;
+        }
+        return textRecognizer.isOperational();
+    }
+
+    public Segments getMeasurement(Bitmap bitmap, Rect rect) {
 
         Bitmap croppedPart = Crop(bitmap, rect);
         String measurement = RecognizeText(croppedPart);
-        return measurement;
+        Segments segment = new Segments(rect);
+
+        if (measurement == null) {
+            segment.setScore(Segments.SCORE_FAILED);
+        } else {
+            segment.setScore(Segments.SCORE_SUCCEED);
+        }
+
+        segment.setValue(measurement);
+        return segment;
     }
 
-    public HashMap<String, String> getAllMeasurement(byte[] bytes)
+    public ArrayList<Segments> getAllMeasurement(byte[] bytes)
     {
         if (croppingMap == null) {
             return null;
@@ -52,12 +69,14 @@ public class ImageTreatment {
 //        bitmap =  BitmapFactory.decodeFile(f.getAbsolutePath());
 //        String dataReco = RecognizeText(bitmap);
 //        RecognizeText(bitmap);
-        HashMap<String, String> measurementHash = new HashMap<>();
+        ArrayList<Segments> segments = new ArrayList<>();
         for (Map.Entry<String, Rect> entry : croppingMap.entrySet()) {
-            measurementHash.put(entry.getKey(), getMeasurement(bitmap, entry.getValue()));
+            Segments segment = getMeasurement(bitmap, entry.getValue());
+            segment.setName(entry.getKey());
+            segments.add(segment);
         }
 
-        return measurementHash;
+        return segments;
     }
 
     private Bitmap convertByteArrayToBitmap(byte[] bytes)

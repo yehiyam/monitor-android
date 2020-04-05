@@ -81,22 +81,22 @@ public class App extends Application {
 
 
 
-        // setup LogcatAppender
-//        PatternLayoutEncoder encoder2 = new PatternLayoutEncoder();
-//        encoder2.setContext(lc);
-//        encoder2.setPattern("[%thread] %msg%n");
-//        encoder2.start();
-//
-//        LogcatAppender logcatAppender = new LogcatAppender();
-//        logcatAppender.setContext(lc);
-//        logcatAppender.setEncoder(encoder2);
-//        logcatAppender.start();
+//         setup LogcatAppender
+        PatternLayoutEncoder encoder2 = new PatternLayoutEncoder();
+        encoder2.setContext(lc);
+        encoder2.setPattern("[%thread] %msg%n");
+        encoder2.start();
+
+        LogcatAppender logcatAppender = new LogcatAppender();
+        logcatAppender.setContext(lc);
+        logcatAppender.setEncoder(encoder2);
+        logcatAppender.start();
 
         // add the newly created appenders to the root logger;
         // qualify Logger to disambiguate from org.slf4j.Logger
         ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
         root.addAppender(fileAppender);
         root.addAppender(exceptionsAppender);
-//        root.addAppender(logcatAppender);
+        root.addAppender(logcatAppender);
     }
 }
