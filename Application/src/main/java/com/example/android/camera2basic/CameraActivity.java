@@ -49,6 +49,7 @@ import org.slf4j.LoggerFactory;
 
 public class CameraActivity extends AppCompatActivity {
 
+    //todo: check if using static logger
     org.slf4j.Logger logger = LoggerFactory.getLogger(MainActivity.class);
 
     public final String TAG = "CameraActivity";
@@ -132,14 +133,15 @@ public class CameraActivity extends AppCompatActivity {
                 try {
                     camera2BasicFragment.takePicture();
                 } catch (java.lang.NullPointerException e) {
-                    logger.error("exception while taking picture", e);
+                    logger.error(String.format("exception while taking picture %s", imageId), e);
+
+                    // restart the fragment if cant not take a picture
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.camera_container, camera2BasicFragment)
+                            .commit();
+
                 }
-
-                //todo: remove after debug
-                Log.d(TAG, "imageFrequency:" + imageFrequencyMili);
-                Log.d(TAG, String.format("dt: %d", System.currentTimeMillis() - lastRunTime));
-                lastRunTime = System.currentTimeMillis();
-
+                addToImageIdCounter();
                 handler.postDelayed(takingPicturesRunnable, imageFrequencyMili);
             }
         };

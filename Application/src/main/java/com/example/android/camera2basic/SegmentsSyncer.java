@@ -19,10 +19,12 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-import static com.example.android.camera2basic.MainActivity.GET_MONITOR_DATA_REST;
+import static com.example.android.camera2basic.App.staticLogger;
 
 
 public class SegmentsSyncer implements Runnable, SegmentsInterface {
+
+    private static final String GET_MONITOR_DATA_REST = "monitor";
 
     public static int frequency;
     private final String serverUrl;
@@ -48,10 +50,11 @@ public class SegmentsSyncer implements Runnable, SegmentsInterface {
         final Request request = new Request.Builder()
                 .url(url)
                 .build();
-        Log.d("network", "request" + request);
+        staticLogger.info("send request " + request);
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
+
 
             }
 
@@ -61,17 +64,19 @@ public class SegmentsSyncer implements Runnable, SegmentsInterface {
                 try {
                     json = response.body().string();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    staticLogger.error(String.format("error in response to %s", call.request()), e);
                 }
 
                 Gson gson = new GsonBuilder()
                         .serializeNulls()
                         .registerTypeAdapter(HashMap.class, new GsonSerializations.CroppingHashMapDeSerializer())
                         .create();
-                Log.d("network", "response:" + json);
-//                try {
-                    segments = gson.fromJson( json, new TypeToken<HashMap<String, Rect>>(){}.getType());
-//                } catch ()
+                try {
+                    segments = gson.fromJson(json, new TypeToken<HashMap<String, Rect>>(){}.getType());
+                } catch (java.lang.IllegalStateException e) {
+                    staticLogger.error(String.format("got bad data from server: %s", json));
+                    // toast
+                }
             }
         });
     }

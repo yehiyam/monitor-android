@@ -20,7 +20,7 @@ import ch.qos.logback.core.spi.FilterReply;
 
 public class App extends Application {
 
-    static  org.slf4j.Logger staticLogger = LoggerFactory.getLogger("static-logger");
+    public static org.slf4j.Logger staticLogger = LoggerFactory.getLogger("static-logger");
     private org.slf4j.Logger logger;
     public void onCreate () {
         // Setup handler for uncaught exceptions.
@@ -78,8 +78,6 @@ public class App extends Application {
         exceptionsAppender.setEncoder(exceptionsEncoder);
         exceptionsAppender.addFilter(exceptionsFilter);
         exceptionsAppender.start();
-
-
 
 //         setup LogcatAppender
         PatternLayoutEncoder encoder2 = new PatternLayoutEncoder();

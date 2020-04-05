@@ -5,6 +5,7 @@ import android.util.Log;
 import com.example.android.camera2basic.Segments;
 import com.example.android.camera2basic.SegmentsSyncer;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -20,10 +21,11 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+
 public class OcrPublisher extends BasePublisher{
 
     private final static String SUFFIX_URL = "monitor";
-    private final static Gson gson = new Gson();
+    private final static Gson gson = new GsonBuilder().serializeNulls().create();
 
     private final MonitorData monitorData;
 
@@ -60,7 +62,8 @@ public class OcrPublisher extends BasePublisher{
     @Override
     protected RequestBody BuildRequestBody() {
         MediaType mediaType = MediaType.parse("application/json");
-//        SegmentsSyncer.getSegments().put()
+        String json = gson.toJson(monitorData);
+        Log.d("json", "json" + json);
         return RequestBody.create(gson.toJson(monitorData), mediaType);
     }
 }

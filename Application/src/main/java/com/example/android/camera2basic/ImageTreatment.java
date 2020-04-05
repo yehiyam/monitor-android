@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.example.android.camera2basic.App.staticLogger;
+
 public class ImageTreatment {
 
     private final TextRecognizer textRecognizer;
@@ -115,13 +117,14 @@ public class ImageTreatment {
 
     private Bitmap Crop(Bitmap bitmap, Rect rect) {
 
-//        try {
-        Log.d("", "Crop: " + rect);
+        try {
+            Log.d(getClass().getSimpleName(), rect.toString());
             bitmap = Bitmap.createBitmap(bitmap, rect.left, rect.top, rect.width(), rect.height());
-//        } catch (IllegalArgumentException e) {
-//
-//        }
-        saveImage(bitmap);
+        } catch (IllegalArgumentException e) {
+            staticLogger.error("try to crop part which is out of image", e);
+        }
+
+//        saveImage(bitmap);
         return bitmap;
     }
 
@@ -132,24 +135,20 @@ public class ImageTreatment {
             f.setBitmap(bitmap);
             SparseArray<TextBlock> dataReco = null;
             dataReco = textRecognizer.detect(f.build());
-            Log.d("textRecognizer", "RecognizeText: " + dataReco);
+
             // todo put null or empty
             if (dataReco == null || dataReco.size() != 1) {
                 return null;
             }
 
-            StringBuilder stringBuilder = new StringBuilder();
-            for(int i=0;i<dataReco.size();i++){
-                TextBlock item = dataReco.valueAt(i);
-                stringBuilder.append(item.getValue());
-                stringBuilder.append("\n");
-            }
+            String ocrValue = dataReco.valueAt(0).getValue();
+            Log.d(getClass().getSimpleName(), ocrValue);
+            return ocrValue;
 
-            return stringBuilder.toString();
         }
         catch (Exception e)
         {
-            //lOG
+            staticLogger.error("got exception", e);
         }
 
         return null;

@@ -22,6 +22,8 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+import static com.example.android.camera2basic.App.staticLogger;
+
 
 public class ImagePublisher extends BasePublisher {
 
@@ -62,6 +64,7 @@ public class ImagePublisher extends BasePublisher {
     public ImagePublisher(byte[] image, int imageId, String monitorId, long timestamp, String BaseUrl) {
         super(imageId, monitorId, BaseUrl);
         this.image = image;
+        this.timeStamp = timestamp;
     }
 
     @Override
@@ -86,12 +89,28 @@ public class ImagePublisher extends BasePublisher {
         return new Callback() {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                Log.e("TAG", "onFailure: " + e);
+                if (e instanceof java.net.SocketTimeoutException) {
+                    staticLogger.info("timeout: " + call.request().header(IMAGE_ID_KEY));
+                    // toast
+                } else if (e instanceof java.net.ConnectException) {
+                    staticLogger.info("connection exception: " + call.request().header(IMAGE_ID_KEY));
+                    // toast
+                } else {
+                    //toast
+                    staticLogger.error("network problem: " + call.request().header(IMAGE_ID_KEY), e);
+                }
             }
 
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                Log.d("TAG", "onResponse: " + response);
+                if (response.code() != 200) {
+                    staticLogger.info(String.format("%s got response code %s: %s",
+                            call.request().header(IMAGE_ID_KEY),
+                            response.code(),
+                            response.body().string()
+                            ));
+                    //toast
+                }
             }
         };
     }

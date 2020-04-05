@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
     public static final String SERVER_URL_STRING = "SERVER_URL_STRING";
     public static final String IMAGE_FREQUENCY_KEY = "IMAGE_FREQUENCY";
     public static final String MONITOR_ID_KEY = "MONITOR_ID";
-    public static final String GET_MONITOR_DATA_REST = "monitor";
+
 
     public static final int WRONG_QR_RESULT_CODE = 2;
 
@@ -285,7 +285,7 @@ public class MainActivity extends AppCompatActivity {
 
     //todo: turn off the first asynctask
     private void startSegmentsSyncer() {
-        segmentsSyncer = new SegmentsSyncer(getString(R.string.default_server_url), monitorId);
+        segmentsSyncer = new SegmentsSyncer(serverUrl, monitorId);
         AsyncTask.execute(segmentsSyncer);
     }
 

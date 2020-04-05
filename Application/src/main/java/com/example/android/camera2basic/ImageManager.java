@@ -59,7 +59,6 @@ public class ImageManager implements Runnable {
                 backgroundHandler.post(new OcrPublisher(monitorData, baseUrl));
             }
             staticLogger.info("segments" + segments);
-            Log.d("measurments", "measurments" + segments);
         } else {
             staticLogger.info("ocr is not supported");
         }

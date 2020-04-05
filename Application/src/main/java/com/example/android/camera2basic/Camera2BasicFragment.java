@@ -570,7 +570,7 @@ public class Camera2BasicFragment extends Fragment
                         }
                         break;
                     default:
-                        Log.e(TAG, "Display rotation is invalid: " + displayRotation);
+                        staticLogger.error("Display rotation is invalid: " + displayRotation);
                 }
 
                 Point displaySize = new Point();
