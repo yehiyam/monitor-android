@@ -25,13 +25,13 @@ import static com.example.android.camera2basic.App.staticLogger;
 public class ImageTreatment {
 
     private final TextRecognizer textRecognizer;
-    private final Activity mActivity;
+//    private final Activity mActivity;
     private final UiHandler uiHandler;
 
-    ImageTreatment(TextRecognizer textRecognizer, Activity activity, UiHandler uiHandler)
+    ImageTreatment(TextRecognizer textRecognizer, UiHandler uiHandler)
     {
         this.textRecognizer = textRecognizer;
-        mActivity = activity;
+//        mActivity = activity;
         this.uiHandler = uiHandler;
     }
 
@@ -159,14 +159,14 @@ public class ImageTreatment {
 
     }
 
-    public void saveImage(Bitmap bmp) {
-        FileOutputStream output = null;
-        File filename = new File(mActivity.getExternalFilesDir("crop"), System.currentTimeMillis() + ".jpg");
-        try (FileOutputStream out = new FileOutputStream(filename)) {
-            bmp.compress(Bitmap.CompressFormat.PNG, 1, out); // bmp is your Bitmap instance
-            // PNG is a lossless format, the compression factor (100) is ignored
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+//    public void saveImage(Bitmap bmp) {
+//        FileOutputStream output = null;
+//        File filename = new File(mActivity.getExternalFilesDir("crop"), System.currentTimeMillis() + ".jpg");
+//        try (FileOutputStream out = new FileOutputStream(filename)) {
+//            bmp.compress(Bitmap.CompressFormat.PNG, 1, out); // bmp is your Bitmap instance
+//            // PNG is a lossless format, the compression factor (100) is ignored
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
 }

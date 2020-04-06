@@ -458,7 +458,7 @@ public class Camera2BasicFragment extends Fragment
     public void onViewCreated(final View view, Bundle savedInstanceState) {
         mTextureView = (AutoFitTextureView) view.findViewById(R.id.texture);
         textRecognizer = new TextRecognizer.Builder(getActivity().getApplicationContext()).build();
-        imageTreatment = new ImageTreatment(textRecognizer, getActivity(), uiHandler);
+        imageTreatment = new ImageTreatment(textRecognizer, uiHandler);
     }
 
     @Override
@@ -940,9 +940,11 @@ public class Camera2BasicFragment extends Fragment
     }
 
     private void setAutoFlash(CaptureRequest.Builder requestBuilder) {
+        // we want to turn off the flash so we just replace this function to turn off the
+        // flash instead of set it to auto
         if (mFlashSupported) {
             requestBuilder.set(CaptureRequest.CONTROL_AE_MODE,
-                    CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
+                    CaptureRequest.CONTROL_AE_MODE_ON);
         }
     }
 
