@@ -2,7 +2,6 @@ package com.example.android.camera2basic;
 
 import android.app.Application;
 import android.os.Process;
-import android.util.Log;
 
 import org.slf4j.LoggerFactory;
 
@@ -15,19 +14,20 @@ import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.filter.ThresholdFilter;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.FileAppender;
-import ch.qos.logback.core.filter.Filter;
-import ch.qos.logback.core.spi.FilterReply;
 
 public class App extends Application {
 
     public static org.slf4j.Logger staticLogger = LoggerFactory.getLogger("static-logger");
+    public static String OCR_FILES_DIR;
     private org.slf4j.Logger logger;
+
     public void onCreate () {
         // Setup handler for uncaught exceptions.
         super.onCreate();
         configureLogbackDirectly();
 
         logger = LoggerFactory.getLogger("exceptions-logger");
+        OCR_FILES_DIR = getExternalFilesDir("ocr").getAbsolutePath();
 
         Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
             @Override

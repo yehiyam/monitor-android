@@ -1,6 +1,5 @@
 package com.example.android.camera2basic;
 
-import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Rect;
@@ -20,9 +19,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.example.android.camera2basic.App.OCR_FILES_DIR;
 import static com.example.android.camera2basic.App.staticLogger;
 
 public class ImageTreatment {
+
+    public static int DOT_LOG_OCR;
+    // this variable determine if
+    private int logOcrImageId;
 
     private final TextRecognizer textRecognizer;
 //    private final Activity mActivity;
@@ -31,8 +35,16 @@ public class ImageTreatment {
     ImageTreatment(TextRecognizer textRecognizer, UiHandler uiHandler)
     {
         this.textRecognizer = textRecognizer;
-//        mActivity = activity;
         this.uiHandler = uiHandler;
+        logOcrImageId = 0;
+    }
+
+    public int getLogOcrImageId() {
+        return logOcrImageId;
+    }
+
+    public void setLogOcrImageId(int logOcrImageId) {
+        this.logOcrImageId = logOcrImageId;
     }
 
     public boolean isOperational() {
@@ -57,6 +69,13 @@ public class ImageTreatment {
             segment.setScore(Segments.SCORE_SUCCEED);
         }
 
+        if (logOcrImageId != 0) {
+            File file = new File(
+                    OCR_FILES_DIR + "/" + logOcrImageId
+                            + "/" + rect.toString() + ".jpg");
+            saveImage(croppedPart, file);
+        }
+
         segment.setValue(measurement);
         return segment;
     }
@@ -68,10 +87,24 @@ public class ImageTreatment {
         }
 
         Bitmap bitmap = convertByteArrayToBitmap(bytes);
-//        File f = new File(mActivity.getExternalFilesDir(null), "test.jpg");
-//        bitmap =  BitmapFactory.decodeFile(f.getAbsolutePath());
-//        String dataReco = RecognizeText(bitmap);
-//        RecognizeText(bitmap);
+
+        if (logOcrImageId != 0) {
+            File file = new File(
+                    OCR_FILES_DIR + "/" + logOcrImageId);
+
+            // create the directory named like the image id
+            try{
+                file.mkdirs();
+                file  = new File(file, logOcrImageId + "-full.jpg");
+                saveImage(bitmap, file);
+            } catch (Exception e) {
+                staticLogger.error("error while trying to save ocr log for image id" + logOcrImageId);
+            }
+
+
+            saveImage(bitmap, file);
+        }
+
         ArrayList<Segments> segments = new ArrayList<>();
         for (Map.Entry<String, Rect> entry : croppingMap.entrySet()) {
             Segments segment = getMeasurement(bitmap, entry.getValue());
@@ -128,7 +161,6 @@ public class ImageTreatment {
             return null;
         }
 
-//        saveImage(bitmap);
         return bitmap;
     }
 
@@ -159,14 +191,13 @@ public class ImageTreatment {
 
     }
 
-//    public void saveImage(Bitmap bmp) {
-//        FileOutputStream output = null;
-//        File filename = new File(mActivity.getExternalFilesDir("crop"), System.currentTimeMillis() + ".jpg");
-//        try (FileOutputStream out = new FileOutputStream(filename)) {
-//            bmp.compress(Bitmap.CompressFormat.PNG, 1, out); // bmp is your Bitmap instance
-//            // PNG is a lossless format, the compression factor (100) is ignored
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//    }
+    public void saveImage(Bitmap bmp, File file) {
+        FileOutputStream output = null;
+        try (FileOutputStream out = new FileOutputStream(file)) {
+            bmp.compress(Bitmap.CompressFormat.PNG, 1, out); // bmp is your Bitmap instance
+            // PNG is a lossless format, the compression factor (100) is ignored
+        } catch (IOException e) {
+            staticLogger.error("can not save file: " + file.getAbsolutePath(), e);
+        }
+    }
 }

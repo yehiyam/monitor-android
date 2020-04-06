@@ -36,7 +36,6 @@ public class ImageManager implements Runnable {
         this.baseUrl = baseUrl;
         this.croppingMap = croppingMap;
         this.uiHandler = uiHandler;
-//        this.activity = activity;
     }
 
 
@@ -53,15 +52,28 @@ public class ImageManager implements Runnable {
         }
 
         long timestamp = System.currentTimeMillis();
+        Log.d("imageid", "run: " + imageId);
         uiHandler.showToast("sending " + imageId);
 
+
         if (imageTreatment.isOperational()) {
+
+            if (CameraActivity.getNumberOfImagesPerSaving() != null && imageId % CameraActivity.getNumberOfImagesPerSaving() == 0) {
+                imageTreatment.setLogOcrImageId(imageId);
+            }
+
             ArrayList<Segments> segments = imageTreatment.getAllMeasurement(bytes, croppingMap);
+
+
             if (segments != null) {
                 MonitorData monitorData = new MonitorData(segments, timestamp);
                 backgroundHandler.post(new OcrPublisher(monitorData, imageId, monitorId, baseUrl, uiHandler));
             }
-            staticLogger.info("segments" + segments);
+
+            if (CameraActivity.getNumberOfImagesPerSaving() != null && imageId % CameraActivity.getNumberOfImagesPerSaving() == 0) {
+                imageTreatment.setLogOcrImageId(ImageTreatment.DOT_LOG_OCR);
+            }
+
         } else {
             uiHandler.showToast("ocr is not supported");
             staticLogger.info("ocr is not supported");
@@ -70,7 +82,4 @@ public class ImageManager implements Runnable {
 
         backgroundHandler.post(new ImagePublisher(bytes, imageId, monitorId, timestamp, baseUrl, uiHandler));
     }
-
-
-
 }

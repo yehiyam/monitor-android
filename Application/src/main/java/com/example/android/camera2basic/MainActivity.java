@@ -198,7 +198,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        startCameraActivity();
     }
 
     private void requestForSpecificPermission() {
