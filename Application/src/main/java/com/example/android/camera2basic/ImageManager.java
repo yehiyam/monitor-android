@@ -21,12 +21,13 @@ public class ImageManager implements Runnable {
     private final String monitorId;
     private final String baseUrl;
     private final HashMap<String, Rect> croppingMap;
+    private final UiHandler uiHandler;
     //    private final CameraActivity activity;
     private Image image;
     private ImageTreatment imageTreatment;
 
     ImageManager(Image image, ImageTreatment imageTreatment, android.os.Handler backgroundHandler,
-                 int imageId, String monitorId, String baseUrl, HashMap<String, Rect> croppingMap) {
+                 int imageId, String monitorId, String baseUrl, HashMap<String, Rect> croppingMap, UiHandler uiHandler) {
         this.image = image;
         this.imageTreatment = imageTreatment;
         this.backgroundHandler = backgroundHandler;
@@ -34,6 +35,7 @@ public class ImageManager implements Runnable {
         this.monitorId = monitorId;
         this.baseUrl = baseUrl;
         this.croppingMap = croppingMap;
+        this.uiHandler = uiHandler;
 //        this.activity = activity;
     }
 
@@ -51,20 +53,22 @@ public class ImageManager implements Runnable {
         }
 
         long timestamp = System.currentTimeMillis();
+        uiHandler.showToast("sending " + imageId);
 
         if (imageTreatment.isOperational()) {
             ArrayList<Segments> segments = imageTreatment.getAllMeasurement(bytes, croppingMap);
             if (segments != null) {
-                MonitorData monitorData = new MonitorData(segments, imageId, monitorId, timestamp);
-                backgroundHandler.post(new OcrPublisher(monitorData, baseUrl));
+                MonitorData monitorData = new MonitorData(segments, timestamp);
+                backgroundHandler.post(new OcrPublisher(monitorData, imageId, monitorId, baseUrl, uiHandler));
             }
             staticLogger.info("segments" + segments);
         } else {
+            uiHandler.showToast("ocr is not supported");
             staticLogger.info("ocr is not supported");
         }
 
 
-        backgroundHandler.post(new ImagePublisher(bytes, imageId, monitorId, timestamp, baseUrl));
+        backgroundHandler.post(new ImagePublisher(bytes, imageId, monitorId, timestamp, baseUrl, uiHandler));
     }
 
 

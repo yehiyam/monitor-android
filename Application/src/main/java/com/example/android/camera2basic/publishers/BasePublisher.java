@@ -4,6 +4,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.example.android.camera2basic.CameraActivity;
+import com.example.android.camera2basic.UiHandler;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -18,6 +19,8 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+import static com.example.android.camera2basic.App.staticLogger;
+
 public abstract class BasePublisher implements Runnable {
 
     protected static final String IMAGE_ID_KEY = "X-IMAGE-ID";
@@ -25,17 +28,20 @@ public abstract class BasePublisher implements Runnable {
     protected static final String MONITOR_ID_KEY = "X-MONITOR-ID";
 
     private final String requestUrl;
+    protected UiHandler uiHandler = null;
     protected int imageId;
     protected long timeStamp;
     protected String monitorId;
 
-    BasePublisher(int imageId, String monitorId, String baseUrl) {
+    BasePublisher(int imageId, String monitorId, String baseUrl, UiHandler uiHandler) {
         this.imageId = imageId;
         this.monitorId = monitorId;
         this.requestUrl = baseUrl + "/" + getSuffixUrl();
+        this.uiHandler = uiHandler;
     }
 
-    BasePublisher(String baseUrl) {
+    BasePublisher(String baseUrl, UiHandler uiHandler) {
+        this.uiHandler = uiHandler;
         this.requestUrl = baseUrl + "/" + getSuffixUrl();
     }
 
@@ -62,6 +68,7 @@ public abstract class BasePublisher implements Runnable {
     public void run() {
         OkHttpClient client = new OkHttpClient().newBuilder().build();
         Request request = buildPostRequest();
+        Log.d(getClass().getSimpleName(), "send request: " + request);
         client.newCall(request).enqueue(getCallback());
     }
 }

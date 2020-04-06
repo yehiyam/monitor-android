@@ -46,11 +46,14 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.core.content.ContextCompat;
 
+import android.os.Looper;
+import android.os.Message;
 import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
@@ -262,7 +265,8 @@ public class Camera2BasicFragment extends Fragment
                             ((CameraActivity) getActivity()).getImageId(),
                             ((CameraActivity) getActivity()).monitorId,
                             ((CameraActivity) getActivity()).serverUrl,
-                            SegmentsSyncer.getSegments()
+                            SegmentsSyncer.getSegments(),
+                            uiHandler
 //                            ((CameraActivity) getActivity()).monitorIdTv
                     ));
         }
@@ -371,6 +375,7 @@ public class Camera2BasicFragment extends Fragment
 
     private ImageTreatment imageTreatment;
     private TextRecognizer textRecognizer;
+    private UiHandler uiHandler;
 
     /**
      * Shows a {@link Toast} on the UI thread.
@@ -453,7 +458,13 @@ public class Camera2BasicFragment extends Fragment
     public void onViewCreated(final View view, Bundle savedInstanceState) {
         mTextureView = (AutoFitTextureView) view.findViewById(R.id.texture);
         textRecognizer = new TextRecognizer.Builder(getActivity().getApplicationContext()).build();
-        imageTreatment = new ImageTreatment(textRecognizer, getActivity());
+        imageTreatment = new ImageTreatment(textRecognizer, getActivity(), uiHandler);
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        uiHandler = new UiHandler(Looper.getMainLooper(), getContext());
     }
 
     @Override

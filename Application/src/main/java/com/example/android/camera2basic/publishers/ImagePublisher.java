@@ -6,6 +6,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.example.android.camera2basic.CameraActivity;
+import com.example.android.camera2basic.UiHandler;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -41,28 +42,8 @@ public class ImagePublisher extends BasePublisher {
      * @return
      */
 
-
-//    public void saveImage(byte[] bytes) {
-//        FileOutputStream output = null;
-//        try {
-//            output = new FileOutputStream(new File(mActivity.getExternalFilesDir(null), ((CameraActivity)mActivity).getImageId() + ".jpg"));
-//            output.write(bytes);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        } finally {
-//            mImage.close();
-//            if (null != output) {
-//                try {
-//                    output.close();
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        }
-//    }
-
-    public ImagePublisher(byte[] image, int imageId, String monitorId, long timestamp, String BaseUrl) {
-        super(imageId, monitorId, BaseUrl);
+    public ImagePublisher(byte[] image, int imageId, String monitorId, long timestamp, String BaseUrl, UiHandler uiHandler) {
+        super(imageId, monitorId, BaseUrl, uiHandler);
         this.image = image;
         this.timeStamp = timestamp;
     }
@@ -91,13 +72,14 @@ public class ImagePublisher extends BasePublisher {
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 if (e instanceof java.net.SocketTimeoutException) {
                     staticLogger.info("timeout: " + call.request().header(IMAGE_ID_KEY));
-                    // toast
+                    uiHandler.showToast(String.format("%s - image -timeout ", imageId));
+
                 } else if (e instanceof java.net.ConnectException) {
                     staticLogger.info("connection exception: " + call.request().header(IMAGE_ID_KEY));
-                    // toast
+                    uiHandler.showToast(String.format("%s - image - connection exception", imageId));
                 } else {
-                    //toast
                     staticLogger.error("network problem: " + call.request().header(IMAGE_ID_KEY), e);
+                    uiHandler.showToast(String.format("%s - image - network problem", imageId));
                 }
             }
 
@@ -105,11 +87,11 @@ public class ImagePublisher extends BasePublisher {
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 if (response.code() != 200) {
                     staticLogger.info(String.format("%s got response code %s: %s",
-                            call.request().header(IMAGE_ID_KEY),
+                            imageId,
                             response.code(),
                             response.body().string()
                             ));
-                    //toast
+                    uiHandler.showToast(String.format("%s - response code %s", imageId, response.code()));
                 }
             }
         };

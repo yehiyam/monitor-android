@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Rect;
 import android.media.Image;
-import android.media.ImageReader;
 import android.util.Log;
 import android.util.SparseArray;
 
@@ -27,12 +26,13 @@ public class ImageTreatment {
 
     private final TextRecognizer textRecognizer;
     private final Activity mActivity;
-    Bitmap bitmap;
+    private final UiHandler uiHandler;
 
-    ImageTreatment(TextRecognizer textRecognizer, Activity activity)
+    ImageTreatment(TextRecognizer textRecognizer, Activity activity, UiHandler uiHandler)
     {
         this.textRecognizer = textRecognizer;
         mActivity = activity;
+        this.uiHandler = uiHandler;
     }
 
     public boolean isOperational() {
@@ -44,7 +44,10 @@ public class ImageTreatment {
 
     public Segments getMeasurement(Bitmap bitmap, Rect rect) {
 
-        Bitmap croppedPart = Crop(bitmap, rect);
+        Bitmap croppedPart = crop(bitmap, rect);
+        if (croppedPart == null) {
+            uiHandler.showToast("bad segments - need to be reconfigured");
+        }
         String measurement = RecognizeText(croppedPart);
         Segments segment = new Segments(rect);
 
@@ -115,13 +118,14 @@ public class ImageTreatment {
 
 
 
-    private Bitmap Crop(Bitmap bitmap, Rect rect) {
+    private Bitmap crop(Bitmap bitmap, Rect rect) {
 
         try {
             Log.d(getClass().getSimpleName(), rect.toString());
             bitmap = Bitmap.createBitmap(bitmap, rect.left, rect.top, rect.width(), rect.height());
         } catch (IllegalArgumentException e) {
             staticLogger.error("try to crop part which is out of image", e);
+            return null;
         }
 
 //        saveImage(bitmap);

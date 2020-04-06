@@ -36,5 +36,6 @@
     <string name="stop_taking_picture_dialog_keep_taking_pictures">המשך צילום</string>
     <string name="stop_taking_pictures_dialog_stop_taking_pictures">הפסק צילום</string>
     <string name="qr_monitor_prefix">cvmonitor</string>
+    <string name="can_not_get_segments_from_server_string">לא מצליח לקבל סגמנטים מהשרת</string>
 
 </resources>

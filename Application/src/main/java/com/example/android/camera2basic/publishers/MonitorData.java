@@ -19,4 +19,24 @@ public class MonitorData {
         this.timestamp = timestamp;
     }
 
+    public MonitorData(ArrayList<Segments> segments, long timestamp) {
+        this.segments = segments;
+        this.timestamp = timestamp;
+    }
+
+    public int getImageId() {
+        return imageId;
+    }
+
+    public void setImageId(int imageId) {
+        this.imageId = imageId;
+    }
+
+    public String getMonitorId() {
+        return monitorId;
+    }
+
+    public void setMonitorId(String monitorId) {
+        this.monitorId = monitorId;
+    }
 }

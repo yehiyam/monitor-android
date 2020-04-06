@@ -27,6 +27,7 @@ import android.hardware.camera2.params.StreamConfigurationMap;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Looper;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.Size;
@@ -66,7 +67,6 @@ import okhttp3.Callback;
 import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
-
     public static final String IMAGE_RESOLUTION_INDEX = "IMAGE_RESOLUTION_INDEX";
     public static final String IMAGE_RESOLUTION_STRING = "IMAGE_RESOLUTION_STRING";
     public static final String SERVER_URL_STRING = "SERVER_URL_STRING";
@@ -103,6 +103,7 @@ public class MainActivity extends AppCompatActivity {
     private String monitorId;
     private String serverUrl;
     SegmentsSyncer segmentsSyncer;
+    UiHandler uiHandler;
 
 
 
@@ -118,6 +119,9 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+        // this ui handler is serve the  SegmentSyncer which keeps working in
+        // the CameraActivity. that why we use here the application context
+        uiHandler = new UiHandler(Looper.getMainLooper(), getApplicationContext());
 
 
         ImageButton startTakingPicturesButton = findViewById(R.id.start_taking_pictures_button);
@@ -285,7 +289,7 @@ public class MainActivity extends AppCompatActivity {
 
     //todo: turn off the first asynctask
     private void startSegmentsSyncer() {
-        segmentsSyncer = new SegmentsSyncer(serverUrl, monitorId);
+        segmentsSyncer = new SegmentsSyncer(serverUrl, monitorId, uiHandler);
         AsyncTask.execute(segmentsSyncer);
     }
 

@@ -22,11 +22,14 @@ import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -114,8 +117,6 @@ public class CameraActivity extends AppCompatActivity {
         camera2BasicFragment = Camera2BasicFragment.newInstance();
 
         stopTakingPicturesButton = findViewById(R.id.stop_taking_pictures_button);
-
-
 
         if (null == savedInstanceState) {
             getSupportFragmentManager().beginTransaction()
