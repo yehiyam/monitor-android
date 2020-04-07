@@ -69,6 +69,14 @@ public abstract class BasePublisher implements Runnable {
         OkHttpClient client = new OkHttpClient().newBuilder().build();
         Request request = buildPostRequest();
         Log.d(getClass().getSimpleName(), "send request: " + request);
-        client.newCall(request).enqueue(getCallback());
+        Callback callback = getCallback();
+        Call call = client.newCall(request);
+        try {
+            Response response = call.execute();
+            callback.onResponse(call,response);
+        } catch (IOException e) {
+            callback.onFailure(call,e);
+        }
+//        client.newCall(request).enqueue(getCallback());
     }
 }
