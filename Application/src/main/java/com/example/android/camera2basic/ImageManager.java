@@ -69,7 +69,14 @@ public class ImageManager implements Runnable {
 
             if (segments != null) {
                 MonitorData monitorData = new MonitorData(segments, timestamp);
-                backgroundHandler.post(new OcrPublisher(monitorData, imageId, monitorId, baseUrl, uiHandler));
+//                backgroundHandler.post(new OcrPublisher(monitorData, imageId, monitorId, baseUrl, uiHandler));
+                try {
+                    new OcrPublisher(monitorData, imageId, monitorId, baseUrl, uiHandler).run();
+                }
+                catch (Exception ex){
+                    staticLogger.warn("sending ocr failed" + ex.getMessage());
+                }
+
             }
 
 //            if (CameraActivity.getNumberOfImagesPerSaving() != null && imageId % CameraActivity.getNumberOfImagesPerSaving() == 0) {
@@ -80,8 +87,12 @@ public class ImageManager implements Runnable {
             uiHandler.showToast("ocr is not supported");
             staticLogger.info("ocr is not supported");
         }
-
-
-        backgroundHandler.post(new ImagePublisher(bytes, imageId, monitorId, timestamp, baseUrl, uiHandler));
+        try {
+            new ImagePublisher(bytes, imageId, monitorId, timestamp, baseUrl, uiHandler).run();
+        }
+        catch (Exception ex){
+            staticLogger.warn("sending image failed" + ex.getMessage());
+        }
+//        backgroundHandler.post(new ImagePublisher(bytes, imageId, monitorId, timestamp, baseUrl, uiHandler));
     }
 }
