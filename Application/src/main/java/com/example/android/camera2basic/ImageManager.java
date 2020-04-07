@@ -58,11 +58,13 @@ public class ImageManager implements Runnable {
 
         if (imageTreatment.isOperational()) {
 
-            if (CameraActivity.getNumberOfImagesPerSaving() != null && imageId % CameraActivity.getNumberOfImagesPerSaving() == 0) {
-                imageTreatment.setLogOcrImageId(imageId);
-            }
+//            if (CameraActivity.getNumberOfImagesPerSaving() != null && imageId % CameraActivity.getNumberOfImagesPerSaving() == 0) {
+//                imageTreatment.setLogOcrImageId(imageId);
+//            }
 
-            ArrayList<Segments> segments = imageTreatment.getAllMeasurement(bytes, croppingMap);
+            int ocrLogImageId = (CameraActivity.getNumberOfImagesPerSaving() != null && imageId % CameraActivity.getNumberOfImagesPerSaving() == 0) ? imageId : 0;
+
+            ArrayList<Segments> segments = imageTreatment.getAllMeasurement(bytes, croppingMap, ocrLogImageId);
 
 
             if (segments != null) {
@@ -70,9 +72,9 @@ public class ImageManager implements Runnable {
                 backgroundHandler.post(new OcrPublisher(monitorData, imageId, monitorId, baseUrl, uiHandler));
             }
 
-            if (CameraActivity.getNumberOfImagesPerSaving() != null && imageId % CameraActivity.getNumberOfImagesPerSaving() == 0) {
-                imageTreatment.setLogOcrImageId(ImageTreatment.DOT_LOG_OCR);
-            }
+//            if (CameraActivity.getNumberOfImagesPerSaving() != null && imageId % CameraActivity.getNumberOfImagesPerSaving() == 0) {
+//                imageTreatment.setLogOcrImageId(ImageTreatment.DOT_LOG_OCR);
+//            }
 
         } else {
             uiHandler.showToast("ocr is not supported");

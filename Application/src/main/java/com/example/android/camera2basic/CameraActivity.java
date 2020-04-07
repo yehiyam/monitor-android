@@ -52,7 +52,7 @@ import org.slf4j.LoggerFactory;
 
 public class CameraActivity extends AppCompatActivity {
 
-    private static Integer NUMBER_OF_IMAGES_PER_SAVING = 3;
+    private static Integer NUMBER_OF_IMAGES_PER_SAVING = null;
 
     public static int FREQUENCY_OCR_LOGGING_MILI = 5 * 60 * 1000;
 
@@ -121,8 +121,7 @@ public class CameraActivity extends AppCompatActivity {
         TextView frequencyTv = findViewById(R.id.image_frequency_tv);
         frequencyTv.setText(imageFrequencyMili.toString());
 
-//        NUMBER_OF_IMAGES_PER_SAVING = FREQUENCY_OCR_LOGGING_MILI / imageFrequencyMili;
-//        NUMBER_OF_IMAGES_PER_SAVING = 2;
+        NUMBER_OF_IMAGES_PER_SAVING = FREQUENCY_OCR_LOGGING_MILI / imageFrequencyMili;
 
         monitorIdTv = findViewById(R.id.monitor_id_tv);
         monitorIdTv.setText(monitorId);

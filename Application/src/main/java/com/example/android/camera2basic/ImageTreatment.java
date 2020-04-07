@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Rect;
 import android.media.Image;
+import android.os.AsyncTask;
 import android.util.Log;
 import android.util.SparseArray;
 
@@ -26,7 +27,7 @@ public class ImageTreatment {
 
     public static int DOT_LOG_OCR;
     // this variable determine if
-    private int logOcrImageId;
+//    private int logOcrImageId;
 
     private final TextRecognizer textRecognizer;
 //    private final Activity mActivity;
@@ -36,16 +37,16 @@ public class ImageTreatment {
     {
         this.textRecognizer = textRecognizer;
         this.uiHandler = uiHandler;
-        logOcrImageId = 0;
+//        logOcrImageId = 0;
     }
 
-    public int getLogOcrImageId() {
-        return logOcrImageId;
-    }
-
-    public void setLogOcrImageId(int logOcrImageId) {
-        this.logOcrImageId = logOcrImageId;
-    }
+//    public int getLogOcrImageId() {
+//        return logOcrImageId;
+//    }
+//
+//    public void setLogOcrImageId(int logOcrImageId) {
+//        this.logOcrImageId = logOcrImageId;
+//    }
 
     public boolean isOperational() {
         if (textRecognizer == null) {
@@ -54,7 +55,7 @@ public class ImageTreatment {
         return textRecognizer.isOperational();
     }
 
-    public Segments getMeasurement(Bitmap bitmap, Rect rect) {
+    public Segments getMeasurement(Bitmap bitmap, Rect rect, int logOcrImageId) {
 
         Bitmap croppedPart = crop(bitmap, rect);
         if (croppedPart == null) {
@@ -80,7 +81,7 @@ public class ImageTreatment {
         return segment;
     }
 
-    public ArrayList<Segments> getAllMeasurement(byte[] bytes, HashMap<String, Rect> croppingMap)
+    public ArrayList<Segments> getAllMeasurement(byte[] bytes, HashMap<String, Rect> croppingMap, int logOcrImageId)
     {
         if (croppingMap == null) {
             return null;
@@ -107,7 +108,7 @@ public class ImageTreatment {
 
         ArrayList<Segments> segments = new ArrayList<>();
         for (Map.Entry<String, Rect> entry : croppingMap.entrySet()) {
-            Segments segment = getMeasurement(bitmap, entry.getValue());
+            Segments segment = getMeasurement(bitmap, entry.getValue(), logOcrImageId);
             segment.setName(entry.getKey());
             segments.add(segment);
         }
@@ -191,13 +192,19 @@ public class ImageTreatment {
 
     }
 
-    public void saveImage(Bitmap bmp, File file) {
-        FileOutputStream output = null;
-        try (FileOutputStream out = new FileOutputStream(file)) {
-            bmp.compress(Bitmap.CompressFormat.PNG, 1, out); // bmp is your Bitmap instance
-            // PNG is a lossless format, the compression factor (100) is ignored
-        } catch (IOException e) {
-            staticLogger.error("can not save file: " + file.getAbsolutePath(), e);
-        }
+
+    //todo: check that all the thread not killing the system
+    private void saveImage(final Bitmap bmp, final File file) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try (FileOutputStream out = new FileOutputStream(file)) {
+                    bmp.compress(Bitmap.CompressFormat.PNG, 1, out); // bmp is your Bitmap instance
+                    // PNG is a lossless format, the compression factor (100) is ignored
+                } catch (IOException e) {
+                    staticLogger.error("can not save file: " + file.getAbsolutePath(), e);
+                }
+            }
+        }).start();
     }
 }
